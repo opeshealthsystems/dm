@@ -13,7 +13,7 @@ deployment = many vendors, one owner.
 Hard requirement from the owner: **payments and escrow must never break.** Port them
 only behind tests that pin the existing behaviour.
 
-## Current state (all tests green: 26 tests, 119 assertions)
+## Current state (all tests green: 63 tests, 376 assertions; 54 `/api/v1` routes)
 
 | Area | State |
 |---|---|
@@ -26,9 +26,11 @@ only behind tests that pin the existing behaviour.
 | Orders: cart, checkout (split per vendor, stock locking, price snapshot), ship, confirm, cancel | done |
 | Order state machine `OrderLifecycle` (idempotent `markPaid`, escrow held/released/refunded) | done |
 | Domain events (`OrderPlaced/Paid/Shipped/Completed/Cancelled/Refunded`) | done, no listeners yet |
+| Reputation: reviews (completed-order buyers only, one per product), vendor reply, helpful votes, follow, cached rating aggregates | done, 11 tests |
+| Messaging: order/general conversations, encrypted bodies, read receipts, blocks, notifications, Order-event listeners | done, 10 tests |
+| Developer Platform: hashed API keys (`dm_live_...`), per-day usage metering, HMAC-signed webhooks with retry | done, 15 tests |
 | Payments (BTC/XMR), Escrow release/payout, Wallet, Disputes, Fees | **not started** |
-| Messaging, Reputation (ratings/reviews), Community (forum), Content/SEO/i18n, Admin | **not started** (empty module folders) |
-| Developer Platform (API keys, webhooks, usage) | **not started** |
+| Community (forum), Content/SEO/i18n, Admin | **not started** (empty module folders) |
 | Web UI: buyer / vendor / admin dashboards | **not started** |
 | Import of legacy users/orders into the new schema | **not started** |
 
@@ -92,11 +94,10 @@ pending -> held -> released | refunded; `shipment_status` pending -> shipped -> 
    `OrderCompleted` / `OrderRefunded`. Keep amounts as integers; log every money event.
 2. **Wallet, vendor fees, payouts, disputes** (admin resolves -> `OrderLifecycle::refund`
    or release).
-3. **Developer Platform:** per-vendor API keys with scopes + rate plans, usage metering
-   table, HMAC-signed webhooks with retries (listen to Order events), sandbox/test mode.
-4. **Reputation** (ratings/reviews only for completed orders), **Messaging**
-   (order-linked threads + notifications), **Community** (forum), **Content/SEO/i18n**
-   (port 12 language files unchanged into Laravel `lang/`).
+3. **Developer Platform follow-ups:** rate plans per key, sandbox/test mode, webhook
+   retry via a real queue worker (currently `QUEUE_CONNECTION`), usage dashboard.
+4. **Community** (forum), **Content/SEO/i18n** (port 12 language files unchanged into
+   Laravel `lang/`). Also: review edit/delete, a dedicated `messages:*` OAuth scope.
 5. **Admin module + API:** users (suspend/verify vendor), catalog moderation, orders,
    disputes, settings, audit log.
 6. **UI:** buyer dashboard, vendor dashboard, admin panel, storefront. Use the API only.

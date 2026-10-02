@@ -7,6 +7,8 @@ use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Policies\ProductPolicy;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Policies\OrderPolicy;
+use App\Modules\Reputation\Models\Review;
+use App\Modules\Reputation\Policies\ReviewPolicy;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -32,6 +34,34 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
+        Gate::policy(Review::class, ReviewPolicy::class);
+
+        // Developer platform
+        Gate::policy(\App\Modules\DeveloperPlatform\Models\ApiKey::class, \App\Modules\DeveloperPlatform\Policies\ApiKeyPolicy::class);
+        Gate::policy(\App\Modules\DeveloperPlatform\Models\WebhookEndpoint::class, \App\Modules\DeveloperPlatform\Policies\WebhookEndpointPolicy::class);
+        foreach ([
+            \App\Modules\Orders\Events\OrderPlaced::class, \App\Modules\Orders\Events\OrderPaid::class,
+            \App\Modules\Orders\Events\OrderShipped::class, \App\Modules\Orders\Events\OrderCompleted::class,
+            \App\Modules\Orders\Events\OrderCancelled::class, \App\Modules\Orders\Events\OrderRefunded::class,
+        ] as $dpEvent) {
+            \Illuminate\Support\Facades\Event::listen($dpEvent, \App\Modules\DeveloperPlatform\Listeners\DispatchOrderWebhooks::class);
+        }
+
+        // Messaging
+        Gate::policy(\App\Modules\Messaging\Models\Conversation::class, \App\Modules\Messaging\Policies\ConversationPolicy::class);
+        Gate::policy(\App\Modules\Messaging\Models\Notification::class, \App\Modules\Messaging\Policies\NotificationPolicy::class);
+        foreach ([
+            \App\Modules\Orders\Events\OrderPlaced::class,
+            \App\Modules\Orders\Events\OrderPaid::class,
+            \App\Modules\Orders\Events\OrderShipped::class,
+            \App\Modules\Orders\Events\OrderCompleted::class,
+            \App\Modules\Orders\Events\OrderCancelled::class,
+            \App\Modules\Orders\Events\OrderRefunded::class,
+        ] as $orderEvent) {
+            \Illuminate\Support\Facades\Event::listen($orderEvent, \App\Modules\Messaging\Listeners\OrderEventSubscriber::class);
+        }
+        RateLimiter::for('messages', fn (Request $request) => Limit::perMinute(20)
+            ->by('msg|' . ($request->user()?->getAuthIdentifier() ?: $request->ip())));
     }
 
     /** OAuth 2.0 scopes exposed to API clients. */

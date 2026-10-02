@@ -21,6 +21,8 @@ class ProductResource extends JsonResource
             'stock' => $this->stock,
             'status' => $this->status,
             'category_id' => $this->category_id,
+            'rating_avg' => $this->rating_avg === null ? null : (float) $this->rating_avg,
+            'rating_count' => (int) $this->rating_count,
             'vendor' => [
                 'id' => $this->vendor_id,
                 'handle' => $this->whenLoaded('vendor', fn () => $this->vendor->handle),
