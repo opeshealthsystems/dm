@@ -1,0 +1,42 @@
+# The legacy site's parent .htaccess forces month-long browser caching and ETag removal.
+# Laravel manages its own cache headers, so turn the inherited rules off here.
+<IfModule mod_expires.c>
+    ExpiresActive Off
+</IfModule>
+<IfModule mod_headers.c>
+    Header unset Cache-Control
+    Header unset Expires
+    <If "%{REQUEST_URI} =~ m#\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?)$#">
+        Header set Cache-Control "public, max-age=2592000"
+    </If>
+    <Else>
+        Header set Cache-Control "no-cache, private"
+    </Else>
+</IfModule>
+FileETag MTime Size
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
