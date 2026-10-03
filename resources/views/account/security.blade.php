@@ -23,7 +23,7 @@
         {{-- E-mail verification --}}
         <section class="card flex flex-col gap-2">
             <h2 class="text-lg font-medium">{{ __('security.page.email_title') }}</h2>
-            <p class="text-sm text-ink-2" x-text="me.email"></p>
+            <p dir="ltr" class="text-sm text-ink-2 break-all rtl:text-end" x-text="me.email"></p>
             <p x-show="me.email_verified"><span class="badge badge-ok">{{ __('security.page.verified') }}</span></p>
             <div x-show="!me.email_verified" class="flex flex-col gap-2">
                 <p><span class="badge badge-warn">{{ __('security.page.unverified') }}</span></p>

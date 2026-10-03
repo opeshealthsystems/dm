@@ -18,7 +18,7 @@
                     <span class="badge" :class="{'badge-warn': p.status === 'pending', 'badge-accent': p.status === 'approved', 'badge-ok': p.status === 'paid', 'badge-bad': p.status === 'rejected'}" x-text="t('admin.payouts.statuses.' + p.status)"></span>
                 </div>
                 <div class="mt-1 text-sm text-ink-2"><span x-text="t('admin.payouts.method')"></span>: <span x-text="p.method.charAt(0).toUpperCase() + p.method.slice(1)"></span> · <span x-text="t('admin.payouts.vendor')"></span> #<span x-text="p.user_id"></span> · <span x-text="fmtDate(p.created_at)"></span></div>
-                <div class="mt-1 break-all text-sm text-ink-3" x-show="p.destination_address" x-text="p.destination_address"></div>
+                <div dir="ltr" class="mt-1 break-all text-sm text-ink-3 rtl:text-end" x-show="p.destination_address" x-text="p.destination_address"></div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button type="button" class="btn btn-sm btn-primary" x-show="p.status === 'pending'" @click="act('admin/payouts/' + p.id + '/approve', {})">{{ __('admin.payouts.approve') }}</button>
                     <button type="button" class="btn btn-sm btn-danger" x-show="p.status === 'pending'" @click="reject(p)">{{ __('admin.payouts.reject') }}</button>

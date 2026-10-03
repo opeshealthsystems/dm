@@ -19,10 +19,7 @@ class WebhookEndpointRequest extends FormRequest
 
         return [
             'url' => [$req, 'url:https,http', 'max:500', function ($attr, $value, $fail) {
-                $host = parse_url((string) $value, PHP_URL_HOST) ?: '';
-                $isIp = filter_var($host, FILTER_VALIDATE_IP);
-                $privateIp = $isIp && ! filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
-                if (app()->isProduction() && (! str_starts_with((string) $value, 'https://') || $privateIp || $host === 'localhost')) {
+                if (\App\Modules\DeveloperPlatform\Support\WebhookUrlGuard::violation((string) $value) !== null) {
                     $fail('The webhook URL must be a public https URL.');
                 }
             }],

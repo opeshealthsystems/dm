@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Links in e-mails (password reset, verification) must never be built from a spoofed Host header.
+        if ($this->app->isProduction() && config('app.url')) {
+            \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+        }
         $this->configureOAuth();
         $this->configureRateLimits();
         $this->configureOpenApi();

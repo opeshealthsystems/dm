@@ -6,7 +6,7 @@
         <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:px-6">
             <a href="{{ route('home') }}" class="link-tap me-auto text-xl font-semibold text-ink no-underline">{{ config('app.name') }}</a>
             <x-language-switcher />
-            <div class="flex w-full gap-2 sm:w-auto [&>a]:flex-1 sm:[&>a]:flex-none">
+            <div class="flex w-full flex-wrap gap-2 sm:w-auto [&>a]:flex-auto sm:[&>a]:flex-none">
                 <a class="btn btn-sm" href="{{ route('community.index') }}">{{ __('community.link') }}</a>
                 <a class="btn btn-sm" href="{{ route('buyer.cart') }}">{{ __('common.nav.cart') }}</a>
                 @auth

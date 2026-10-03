@@ -21,9 +21,14 @@ class PaymentController extends Controller
     public function show(Order $order, PaymentService $payments): PaymentResource|JsonResponse
     {
         $this->authorize('view', $order);
+        // The deposit address is for the paying buyer (and support), not the vendor.
+        abort_unless($order->buyer_id === request()->user()->id || request()->user()->isAdmin(), 403);
 
         $payment = Payment::where('order_id', $order->id)->where('method', $order->payment_method)->first();
         if (! $payment) {
+            if ($order->status !== \App\Modules\Orders\Models\Order::STATUS_PENDING_PAYMENT) {
+                return response()->json(['message' => 'Payment is not available for this order.'], 404);
+            }
             try {
                 $payment = $payments->createForOrder($order);
             } catch (\Throwable $e) {

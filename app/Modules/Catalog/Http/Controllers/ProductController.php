@@ -76,6 +76,10 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product): ProductResource
     {
         $this->authorize('update', $product);
+        if (! $request->user()->isAdmin() && $product->status === Product::STATUS_ARCHIVED && $product->moderated_at !== null
+            && $request->has('status') && $request->validated('status') !== Product::STATUS_ARCHIVED) {
+            abort(403, 'This product was archived by a moderator.');
+        }
         $this->ensureCanPublish($request->user(), $request->validated('status'), $product->status);
         $product->update($request->validated());
 

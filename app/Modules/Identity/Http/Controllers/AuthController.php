@@ -101,6 +101,13 @@ class AuthController extends Controller
         $user = $request->user();
         $user->password = $request->validated('password');
         $user->save();
+        // A changed password must end every other session/token (stolen-token recovery).
+        $t = $user->currentAccessToken();
+        $currentId = is_object($t) && isset($t->id) ? $t->id : null;
+        $ids = \Laravel\Passport\Passport::token()->where('user_id', $user->id)
+            ->when($currentId, fn ($q) => $q->where('id', '!=', $currentId))->pluck('id');
+        \Laravel\Passport\Passport::token()->whereIn('id', $ids)->update(['revoked' => true]);
+        \Laravel\Passport\Passport::refreshToken()->whereIn('access_token_id', $ids)->update(['revoked' => true]);
 
         return response()->json(['message' => 'Password updated.']);
     }

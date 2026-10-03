@@ -22,7 +22,7 @@
             <tbody>
             <template x-for="u in items" :key="u.id">
                 <tr>
-                    <td><div class="font-medium" x-text="u.name"></div><div class="text-sm text-ink-3" x-text="u.email"></div></td>
+                    <td><div class="font-medium" x-text="u.name"></div><div dir="ltr" class="text-sm text-ink-3 break-all rtl:text-end" x-text="u.email"></div></td>
                     <td x-text="t('admin.users.roles.' + u.role)"></td>
                     <td><span class="badge" :class="u.suspended_at ? 'badge-bad' : 'badge-ok'" x-text="u.suspended_at ? t('admin.users.suspended') : t('admin.users.active')"></span>
                         <span class="badge ms-1" :class="u.is_verified_vendor ? 'badge-accent' : ''" x-show="u.role === 'vendor'" x-text="u.is_verified_vendor ? t('admin.users.verified') : t('admin.users.unverified')"></span></td>
@@ -41,7 +41,7 @@
     <div class="grid gap-3 md:hidden" x-show="!loading" x-cloak>
         <template x-for="u in items" :key="'m' + u.id">
             <article class="card">
-                <div class="font-medium" x-text="u.name"></div><div class="text-sm text-ink-3" x-text="u.email"></div>
+                <div class="font-medium" x-text="u.name"></div><div dir="ltr" class="text-sm text-ink-3 break-all rtl:text-end" x-text="u.email"></div>
                 <div class="mt-2 flex flex-wrap gap-2">
                     <span class="badge" x-text="t('admin.users.roles.' + u.role)"></span>
                     <span class="badge" :class="u.suspended_at ? 'badge-bad' : 'badge-ok'" x-text="u.suspended_at ? t('admin.users.suspended') : t('admin.users.active')"></span>

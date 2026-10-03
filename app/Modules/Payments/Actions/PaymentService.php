@@ -157,7 +157,14 @@ class PaymentService
 
         if ($markPaidFor !== null) {
             // Idempotent: a no-op if the order is no longer pending (legacy markPaid behaviour).
-            $this->lifecycle->markPaid(Order::findOrFail($markPaidFor));
+            $before = Order::findOrFail($markPaidFor);
+            $after = $this->lifecycle->markPaid($before);
+            if ($before->status !== Order::STATUS_PENDING_PAYMENT) {
+                // Funds arrived for an order that was already cancelled/paid: needs manual reconciliation.
+                PaymentLogger::warning('Payment confirmed for an order that is not awaiting payment', [
+                    'payment_id' => $payment->id, 'order_id' => $markPaidFor, 'order_status' => $before->status,
+                ]);
+            }
             PaymentLogger::info('Order marked paid', ['payment_id' => $payment->id, 'order_id' => $markPaidFor]);
         }
 

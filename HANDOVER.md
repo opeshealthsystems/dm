@@ -13,6 +13,18 @@ deployment = many vendors, one owner.
 Hard requirement from the owner: **payments and escrow must never break.** Port them
 only behind tests that pin the existing behaviour.
 
+## Run it locally (Laragon)
+
+- Folder `C:\laragon\www\dm` is served by Laragon at **http://dm.test** (virtual host
+  `auto.dm.test.conf`, document root `public/`). Apache must be running: open Laragon, Start All.
+- Local DB is SQLite (`database/database.sqlite`, created by `php artisan migrate`), seeded with
+  categories, community categories and demo products. Local login credentials for the admin, a
+  demo seller and a demo buyer are in `storage/app/private/dev-credentials.txt` (git-ignored; delete
+  before any deployment). Switch `.env` to MySQL when MySQL is running.
+- Pages: `/` storefront, `/login`, `/community`, `/faq`, `/docs/api` (OpenAPI UI).
+- Known: `/docs/api` is slow on the first request (spec generation takes 15-100 s); for production,
+  serve the committed `docs/openapi.json` or cache it.
+
 ## Open blockers (need the owner)
 
 1. **GitHub push is blocked on authentication.** The credential manager waits for an
@@ -37,7 +49,7 @@ only behind tests that pin the existing behaviour.
   `unsafe-eval` (Alpine + inline page scripts). Backlog: per-request nonces + Alpine CSP build.
 - The test suite takes ~3.5 minutes, mostly pure-PHP Bitcoin key derivation.
 
-## Current state (all tests green: 379 tests, 5605 assertions; 216 routes)
+## Current state (all tests green: 409 tests, 5693 assertions; 216 routes)
 
 | Area | State |
 |---|---|

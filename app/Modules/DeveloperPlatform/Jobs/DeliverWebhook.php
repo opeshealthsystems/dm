@@ -38,14 +38,20 @@ class DeliverWebhook implements ShouldQueue
         $ts = time();
         $delivery->increment('attempts');
 
+        // Re-check at send time (DNS may have changed since saving: rebinding); never follow redirects.
+        if (\App\Modules\DeveloperPlatform\Support\WebhookUrlGuard::violation($endpoint->url) !== null) {
+            $delivery->update(['status' => 'failed', 'response_code' => null, 'error' => 'Target URL is not allowed.']);
+
+            return;
+        }
         try {
-            $response = Http::withBody($body, 'application/json')->timeout(10)->withHeaders([
+            $response = Http::withOptions(['allow_redirects' => false])->withBody($body, 'application/json')->timeout(10)->withHeaders([
                 'X-DM-Event' => $delivery->event,
                 'X-DM-Delivery' => $delivery->event_id,
                 'X-DM-Signature' => WebhookSigner::header($endpoint->secret, $ts, $body),
             ])->post($endpoint->url);
         } catch (\Throwable $e) {
-            $delivery->update(['status' => 'retrying', 'response_code' => null, 'error' => substr($e->getMessage(), 0, 500)]);
+            $delivery->update(['status' => 'retrying', 'response_code' => null, 'error' => 'Delivery failed (connection error).']);
             throw $e;
         }
 

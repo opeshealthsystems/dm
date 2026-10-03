@@ -32,6 +32,9 @@ class PageController extends Controller
         abort_unless(array_key_exists($code, config('locales.supported')), 404);
         $request->session()->put('locale', $code);
 
-        return redirect()->back()->withCookie(cookie()->forever('locale', $code));
+        $back = url()->previous();
+        $sameHost = parse_url($back, PHP_URL_HOST) === $request->getHost();
+
+        return redirect()->to($sameHost ? $back : route('home'))->withCookie(cookie()->forever('locale', $code));
     }
 }

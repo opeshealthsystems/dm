@@ -17,7 +17,7 @@
             <template x-for="l in items" :key="l.id">
                 <tr>
                     <td class="whitespace-nowrap text-sm text-ink-2" x-text="fmtDate(l.created_at)"></td>
-                    <td class="text-sm" x-text="l.actor?.email"></td>
+                    <td dir="ltr" class="text-sm rtl:text-end" x-text="l.actor?.email"></td>
                     <td class="font-medium" x-text="l.action"></td>
                     <td class="text-sm text-ink-2" x-text="(l.target_type ?? '') + ' ' + (l.target_id ?? '')"></td>
                 </tr>

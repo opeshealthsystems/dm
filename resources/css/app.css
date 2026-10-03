@@ -114,6 +114,8 @@
 h1 { font-size: 1.5rem; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; overflow-wrap: anywhere; }
 h2 { font-weight: 600; letter-spacing: -0.005em; }
 @media (min-width: 640px) { h1 { font-size: 1.75rem; } }
+.btn { text-align: center; overflow-wrap: anywhere; }
+.nav-link { overflow-wrap: anywhere; }
 .btn:active { transform: translateY(1px); }
 .btn:disabled, .btn[disabled] { opacity: .55; cursor: not-allowed; }
 .btn-primary:disabled { background: var(--c-accent); }

@@ -34,6 +34,11 @@ class CheckoutService
             // Lock products in a stable order to avoid deadlocks between concurrent checkouts.
             $products = Product::whereIn('id', $cart->pluck('product_id'))
                 ->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+            foreach ($cart as $line) {
+                if (! isset($products[$line->product_id])) {
+                    throw new OrderException('An item in your cart is no longer available.', 422);
+                }
+            }
 
             $created = collect();
             $byVendor = $cart->groupBy(fn (CartItem $i) => $products[$i->product_id]->vendor_id ?? 0);

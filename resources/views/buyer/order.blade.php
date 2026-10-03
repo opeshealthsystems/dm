@@ -46,7 +46,7 @@
                 <h2 id="pay-h" class="mb-2 text-lg font-medium">{{ __('buyer.order.payment') }}</h2>
                 <p x-show="payLoading && !payment" class="text-ink-2" role="status">{{ __('common.loading') }}</p>
                 <div x-show="payUnavailable && !payment && !payLoading" x-cloak class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-2 p-3 text-ink-2" role="status">
-                    <span class="min-w-0 flex-1 basis-48">{{ __('buyer.order.pay_unavailable') }}</span>
+                    <span class="min-w-0 flex-1 basis-48 wrap-anywhere">{{ __('buyer.order.pay_unavailable') }}</span>
                     <button type="button" class="btn btn-sm" @click="loadPayment()">{{ __('buyer.shared.retry') }}</button>
                 </div>
                 <div x-show="payError" x-cloak class="flex flex-wrap items-center gap-3">
@@ -64,7 +64,7 @@
                         <div>
                             <div class="text-sm text-ink-3">{{ __('buyer.order.address') }}</div>
                             <div class="flex flex-wrap items-center gap-2">
-                                <code class="min-w-0 break-all rounded bg-surface-2 px-2 py-1" x-text="payment.address"></code>
+                                <code dir="ltr" class="min-w-0 break-all rounded bg-surface-2 px-2 py-1" x-text="payment.address"></code>
                                 <button type="button" class="btn btn-sm" @click="copy(payment.address)" x-text="copied ? t('buyer.order.copied') : t('buyer.order.copy')"></button>
                             </div>
                         </div>

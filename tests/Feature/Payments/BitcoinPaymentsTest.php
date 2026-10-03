@@ -314,7 +314,7 @@ class BitcoinPaymentsTest extends TestCase
 
         $vendor = $order->vendor;
         Passport::actingAs($vendor, $vendor->allowedScopes());
-        $this->getJson("/api/v1/orders/{$order->id}/payment")->assertOk();
+        $this->getJson("/api/v1/orders/{$order->id}/payment")->assertForbidden();
 
         $stranger = User::factory()->create(['role' => 'buyer']);
         Passport::actingAs($stranger, $stranger->allowedScopes());
