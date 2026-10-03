@@ -33,5 +33,7 @@ class DatabaseSeeder extends Seeder
                 Category::firstOrCreate(['slug' => str($child)->slug()->value()], ['name' => $child, 'parent_id' => $parent->id]);
             }
         }
+
+        $this->call(CommunitySeeder::class);
     }
 }

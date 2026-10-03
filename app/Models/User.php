@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 
 #[Fillable(['name', 'handle', 'email', 'password', 'shop_name', 'shop_description'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements OAuthenticatable
+#[Hidden(['password', 'remember_token', 'two_factor_secret', 'two_factor_last_step'])]
+class User extends Authenticatable implements MustVerifyEmail, OAuthenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -29,9 +30,33 @@ class User extends Authenticatable implements OAuthenticatable
         return [
             'email_verified_at' => 'datetime',
             'suspended_at' => 'datetime',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_confirmed_at' => 'datetime',
             'is_verified_vendor' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function recoveryCodes(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Identity\Models\RecoveryCode::class);
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_secret !== null && $this->two_factor_confirmed_at !== null;
+    }
+
+    /** Mail the verification link (see Identity\Actions\EmailVerification). */
+    public function sendEmailVerificationNotification(): void
+    {
+        app(\App\Modules\Identity\Actions\EmailVerification::class)->send($this);
+    }
+
+    /** Mail the password reset link (see Identity\Actions\PasswordReset). */
+    public function sendPasswordResetNotification($token): void
+    {
+        app(\App\Modules\Identity\Actions\PasswordReset::class)->mail($this, (string) $token);
     }
 
     public function products(): HasMany

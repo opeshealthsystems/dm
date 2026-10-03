@@ -8,4 +8,6 @@ return [
     \App\Modules\Admin\Providers\AdminServiceProvider::class,
     \App\Modules\Wallet\WalletServiceProvider::class,
     \App\Modules\Escrow\EscrowServiceProvider::class,
+    \App\Modules\Identity\IdentityServiceProvider::class,
+    \App\Modules\Community\Providers\CommunityServiceProvider::class,
 ];

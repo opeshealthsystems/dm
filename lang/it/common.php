@@ -22,6 +22,7 @@ return [
     ],
 
     'nav' => [
+        'community' => 'Community',
         'orders' => 'Ordini',
         'cart' => 'Carrello',
         'messages' => 'Messaggi',
@@ -38,6 +39,7 @@ return [
         'payouts' => 'Prelievi',
         'settings' => 'Impostazioni',
         'audit' => 'Registro attività',
+        'support' => 'Assistenza',
     ],
 
     'auth' => [

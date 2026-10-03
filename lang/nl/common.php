@@ -22,6 +22,7 @@ return [
     ],
 
     'nav' => [
+        'community' => 'Community',
         'orders' => 'Bestellingen',
         'cart' => 'Winkelwagen',
         'messages' => 'Berichten',
@@ -38,6 +39,7 @@ return [
         'payouts' => 'Uitbetalingen',
         'settings' => 'Instellingen',
         'audit' => 'Auditlog',
+        'support' => 'Support',
     ],
 
     'auth' => [

@@ -16,6 +16,9 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
+            // Second factor, only needed when the account has 2FA enabled.
+            'code' => ['nullable', 'string', 'max:16'],
+            'recovery_code' => ['nullable', 'string', 'max:32'],
         ];
     }
 }

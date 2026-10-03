@@ -58,3 +58,35 @@ Route::middleware(['auth', 'role:buyer,vendor,admin'])->prefix('account')->group
 Route::get('/', [StorefrontController::class, 'home'])->name('home');
 Route::get('/p/{slug}', [StorefrontController::class, 'product'])->name('store.product');
 Route::get('/v/{vendor}', [StorefrontController::class, 'vendor'])->whereNumber('vendor')->name('store.vendor');
+
+// Community forum pages (data from /api/v1/community; the thread page is server-rendered, see the module).
+require base_path('app/Modules/Community/web.php');
+
+// Public content pages (about, how it works, FAQ, legal, seller guide, contact).
+Route::controller(\App\Http\Controllers\Web\ContentController::class)->group(function () {
+    Route::get('/about', 'about')->name('pages.about');
+    Route::get('/how-it-works', 'how')->name('pages.how');
+    Route::get('/faq', 'faq')->name('pages.faq');
+    Route::get('/terms', 'terms')->name('pages.terms');
+    Route::get('/privacy', 'privacy')->name('pages.privacy');
+    Route::get('/sellers', 'sellers')->name('pages.sellers');
+    Route::get('/contact', 'contact')->name('pages.contact');
+});
+
+// robots.txt and the sitemap are anonymous and cacheable: no session, cookie or locale handling.
+Route::withoutMiddleware([
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+    \App\Http\Middleware\SetLocale::class,
+    \Laravel\Passport\Http\Middleware\CreateFreshApiToken::class,
+])->controller(\App\Modules\ContentSeo\Http\Controllers\SitemapController::class)->group(function () {
+    Route::get('/robots.txt', 'robots')->name('seo.robots');
+    Route::get('/sitemap.xml', 'index')->name('seo.sitemap');
+    Route::get('/sitemaps/{type}-{n}.xml', 'part')->where(['type' => 'pages|products|vendors', 'n' => '[0-9]+'])->name('seo.sitemap.part');
+});
+
+// Unknown URLs: a translated 404 page (this route runs the web middleware, so the language is known).
+Route::fallback(fn () => abort(404));

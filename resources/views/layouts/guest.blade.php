@@ -1,5 +1,7 @@
 @extends('layouts.base')
 
+@section('robots', 'noindex,nofollow')
+
 @section('body')
 <div class="flex min-h-screen flex-col items-center justify-center p-4">
     <div class="mb-4 self-end"><x-language-switcher /></div>

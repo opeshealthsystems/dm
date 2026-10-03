@@ -30,6 +30,9 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
     });
 
+    // --- Support: public contact form (honeypot + dedicated throttle) ----
+    Route::post('support', [\App\Modules\ContentSeo\Http\Controllers\SupportController::class, 'store'])->middleware('throttle:support');
+
     // --- Catalog: public reads -----------------------------------------
     Route::middleware('throttle:api')->group(function () {
         Route::get('categories', [\App\Modules\Catalog\Http\Controllers\CategoryController::class, 'index']);
@@ -147,3 +150,6 @@ Route::prefix('v1')->group(function () {
 
 // Admin module routes (/api/v1/admin/*)
 Route::prefix('v1')->group(base_path('app/Modules/Admin/routes.php'));
+
+// Community module routes (/api/v1/community/*)
+Route::prefix('v1')->group(base_path('app/Modules/Community/routes.php'));

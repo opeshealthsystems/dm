@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Modules\Identity\Actions\Authenticator;
+use App\Modules\Identity\Exceptions\AccountSafetyException;
 use App\Modules\Identity\Http\Requests\LoginRequest;
 use App\Modules\Identity\Http\Requests\RegisterRequest;
 use Illuminate\Http\RedirectResponse;
@@ -19,19 +21,30 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function login(LoginRequest $request): RedirectResponse
+    public function login(LoginRequest $request, Authenticator $authenticator): RedirectResponse
     {
         $credentials = $request->validated();
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
-            throw ValidationException::withMessages(['email' => [__('common.auth.failed')]]);
+        try {
+            $user = $authenticator->checkPassword($credentials['email'], $credentials['password']);
+        } catch (AccountSafetyException $e) {
+            throw ValidationException::withMessages(['email' => [$e->getMessage()]]);
         }
 
-        if (Auth::user()->isSuspended()) {
-            Auth::logout();
-            throw ValidationException::withMessages(['email' => [__('common.auth.suspended')]]);
+        if ($user->hasTwoFactorEnabled()) {
+            // Not signed in yet: park the user id in the session and ask for the second factor.
+            $request->session()->regenerate();
+            $request->session()->put('login.2fa', [
+                'id' => $user->id,
+                'remember' => $request->boolean('remember'),
+                'expires' => now()->addMinutes(5)->getTimestamp(),
+            ]);
+
+            return redirect()->route('two-factor.challenge');
         }
 
+        $authenticator->complete($user);
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard'));
@@ -49,6 +62,7 @@ class AuthController extends Controller
         $user = new User(collect($data)->except('role')->all());
         $user->role = $data['role'] ?? User::ROLE_BUYER;
         $user->save();
+        $user->sendEmailVerificationNotification();
 
         Auth::login($user);
         $request->session()->regenerate();

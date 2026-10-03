@@ -37,6 +37,7 @@ document.addEventListener('alpine:init', () => Alpine.data('sellerProfile', () =
 
 <div x-data="sellerProfile">
     <h1 class="mb-4 text-2xl font-medium">{{ __('seller.profile.title') }}</h1>
+    <p class="mb-4"><a class="btn btn-sm" href="{{ route('account.security') }}">{{ __('security.page.title') }}</a></p>
 
     @include('seller.partials.state')
 

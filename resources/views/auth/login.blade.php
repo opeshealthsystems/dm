@@ -4,6 +4,8 @@
 
 @section('content')
 <h1 class="mb-4 text-xl font-medium">{{ __('common.auth.login') }}</h1>
+@if (session('status'))<div class="mb-4 rounded-lg bg-ok-soft p-3 text-sm text-ok" role="status">{{ session('status') }}</div>@endif
+@if (session('status_error'))<div class="mb-4 rounded-lg bg-bad-soft p-3 text-sm text-bad" role="alert">{{ session('status_error') }}</div>@endif
 <form method="POST" action="{{ url('/login') }}" class="grid gap-4">@csrf
     <div>
         <label for="email">{{ __('common.auth.email') }}</label>
@@ -14,6 +16,7 @@
         <label for="password">{{ __('common.auth.password') }}</label>
         <input id="password" name="password" type="password" required autocomplete="current-password">
     </div>
+    <div class="-mt-2 text-end text-sm"><a href="{{ route('password.request') }}">{{ __('security.forgot.link') }}</a></div>
     <label class="flex items-center gap-2 !mb-0"><input type="checkbox" name="remember" value="1" class="!w-auto !min-h-0"> {{ __('common.auth.remember') }}</label>
     <button class="btn btn-primary" type="submit">{{ __('common.auth.login') }}</button>
 </form>

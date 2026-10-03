@@ -65,6 +65,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request): JsonResponse
     {
         $this->authorize('create', Product::class);
+        $this->ensureCanPublish($request->user(), $request->validated('status'), null);
 
         $product = $request->user()->products()->create($request->validated())->refresh(); // load DB defaults (currency, stock, status)
 
@@ -75,6 +76,7 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product): ProductResource
     {
         $this->authorize('update', $product);
+        $this->ensureCanPublish($request->user(), $request->validated('status'), $product->status);
         $product->update($request->validated());
 
         return new ProductResource($product);
@@ -87,5 +89,13 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->json(null, 204);
+    }
+
+    /** Unverified e-mail addresses may save drafts but not make a product active (publish). */
+    private function ensureCanPublish(\App\Models\User $user, ?string $newStatus, ?string $oldStatus): void
+    {
+        if ($newStatus === Product::STATUS_ACTIVE && $oldStatus !== Product::STATUS_ACTIVE && ! $user->hasVerifiedEmail()) {
+            throw new \App\Modules\Identity\Exceptions\AccountSafetyException(__('security.verify.required'), 'email_unverified', 403);
+        }
     }
 }

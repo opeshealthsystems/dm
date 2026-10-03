@@ -22,6 +22,7 @@ return [
     ],
 
     'nav' => [
+        'community' => 'コミュニティ',
         'orders' => '注文',
         'cart' => 'カート',
         'messages' => 'メッセージ',
@@ -38,6 +39,7 @@ return [
         'payouts' => '出金',
         'settings' => '設定',
         'audit' => '監査ログ',
+        'support' => 'サポート',
     ],
 
     'auth' => [

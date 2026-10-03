@@ -37,7 +37,7 @@ only behind tests that pin the existing behaviour.
   `unsafe-eval` (Alpine + inline page scripts). Backlog: per-request nonces + Alpine CSP build.
 - The test suite takes ~3.5 minutes, mostly pure-PHP Bitcoin key derivation.
 
-## Current state (all tests green: 195 tests, 1675 assertions)
+## Current state (all tests green: 379 tests, 5605 assertions; 216 routes)
 
 | Area | State |
 |---|---|
@@ -60,9 +60,10 @@ only behind tests that pin the existing behaviour.
 | Web UI: storefront, buyer area, seller area, admin panel (Blade + Alpine + Tailwind 4, calls `/api/v1` only) | done, QA'd in a browser at 360px/1280px, light/dark, LTR/RTL |
 | i18n: 12 languages (en nl de fr es it pt ru zh-hans ja ko ar) for common/buyer/seller/admin; RTL for Arabic | done, parity test enforces keys + placeholders |
 | Role-aware scope middleware, security headers | done |
-| Community (forum), public content/SEO pages (about, FAQ, terms), sitemap/robots | **not started** |
+| Community forum: categories (admin), threads, posts, markdown-lite (safe), reports + admin queue, pin/lock, 15-min edit, soft delete, cooldown/link guard/rate limits, vendor badge, product link, subscriptions + unread, 12 languages | done (tests/Feature/Community) |
+| Public content/SEO pages (about, how it works, FAQ, terms, privacy, seller guide, contact), sitemap/robots, JSON-LD, error pages | done (legal text is a template, see "Public site pages and SEO") |
 | Import of legacy users/orders into the new schema | **not started** |
-| Password reset, email verification, 2FA (TOTP) | **not started** |
+| Account safety: password reset, e-mail verification (gates payouts + publishing), TOTP 2FA + recovery codes, per-account lockout, `/account/security` page (Identity module; tests in `AccountSafetyTest`, `SecurityPagesTest`) | done; no QR image (secret + otpauth link shown) |
 
 ## Architecture rules
 
@@ -122,13 +123,11 @@ pending -> held -> released | refunded; `shipment_status` pending -> shipped -> 
    escrow -> ship -> confirm -> vendor credit -> payout); independent security review;
    configure real xpub / wallet-rpc via `.env` (never commit); queue worker + scheduler
    (`php artisan schedule:work`) running; HTTPS.
-2. **Account safety:** password reset, email verification, TOTP 2FA (admins first),
-   login throttling by account, session hardening.
-3. **Hardening:** CSP nonces + Alpine CSP build (drop `unsafe-inline/eval`), tighten
+2. **Hardening:** CSP nonces + Alpine CSP build (drop `unsafe-inline/eval`), tighten
    CORS (`config/cors.php` currently allows all origins for `api/*`), backups, log
-   shipping, rate limits per API key plan.
-4. **Community** (forum) and public content pages (about, FAQ, terms, privacy,
-   how-it-works), sitemap/robots, SEO meta per page, all in the 12 languages.
+   shipping, rate limits per API key plan, QR image for 2FA setup (currently secret + link),
+   enforce 2FA for admins (currently a banner nudge), email the operator on new support requests.
+3. **Lawyer review** of Terms and Privacy in all 12 languages (see the pages section below).
 5. **Developer Platform follow-ups:** rate plans per key, sandbox/test mode, usage
    dashboard UI, API docs landing page with an OAuth quickstart.
 6. **Legacy import:** artisan command mapping legacy `users`, `products`, `product_orders`
@@ -163,3 +162,14 @@ php artisan migrate:fresh                          # dev only
 - `MoneroGateway` (wallet-rpc `create_address`, piconero math, `get_transfers`), config `config/monero.php`, `Gateways/Monero/{MoneroRpc,MoneroRate,MoneroHealth}`. Registered in PaymentsServiceProvider. 12 tests in `tests/Feature/Payments/MoneroGatewayTest.php`.
 - Legacy view-only derivation (`MoneroHelper`) and the daemon mempool scanner used keccak stubs, not ed25519; they were NOT ported. Wallet RPC is the only source.
 - Deviations: confirmations = least-confirmed tx (legacy: max); pool txs counted as detected; no `/api/v1/health/monero` route yet (no admin scope exists; use `MoneroHealth::check()`).
+
+## Public site pages and SEO (done)
+- Pages `/about /how-it-works /faq /terms /privacy /sellers /contact` (`ContentController`, views in `resources/views/pages`, all text in `lang/<locale>/pages.php`, 12 locales). Footer with links is in `layouts/store.blade.php`.
+- **LEGAL REVIEW REQUIRED:** the Terms of service and Privacy policy are plain-language TEMPLATES, accurate to what the app does today (data collected, cookies = session + locale + CSRF only, no trackers) but NOT lawyer-reviewed. Before launch have the operator's lawyer review/adjust all 12 languages: governing law and courts, controller identity and address, retention periods, age limit, dispute rules. `config/seo.php` `legal_updated` is the "last updated" date shown on both pages; bump it on every change. The commission percentage in FAQ/seller guide is read from `marketplace.default_commission_bps`. Re-check the claims in the FAQ/seller guide if payment confirmation times, payout flow or webhook events change.
+- Contact form: `POST /api/v1/support` (public, `throttle:support` 5/min + 20/h per IP, honeypot field `website`, message stored encrypted in `support_requests`). Admin: `GET /api/v1/admin/support`, `POST /api/v1/admin/support/{id}/handle` (audited), page `/admin/support` (menu key `nav.support`). Nothing e-mails the operator yet: add a notification/mail listener if wanted.
+- SEO: `partials/seo.blade.php` (included by `layouts/base`) emits description, robots, canonical, hreflang for all locales (`?lang=`; default language = bare URL; x-default), Open Graph and Twitter tags. Pages set `@section('title'|'description'|'canonical_url'|'og_type'|'robots')`. Auth and dashboard layouts are `noindex,nofollow`. JSON-LD via `partials/jsonld` + `Support/Seo` (Organization+WebSite on home, Product/AggregateOffer/AggregateRating on `/p/{slug}`, Organization on `/v/{id}`, FAQPage, BreadcrumbList).
+- `/p/{slug}` and `/v/{id}` are server-rendered (title/description/price/JSON-LD); Alpine still hydrates and replaces the server block. Unknown/inactive products are now a real 404 (owner and admin may still preview a draft, noindex).
+- `/robots.txt` and `/sitemap.xml` are routes (the static `public/robots.txt` was deleted; it would shadow the route). Sitemap is one file until it passes `seo.sitemap_chunk` URLs (default 5000), then an index with `/sitemaps/{pages|products|vendors}-N.xml`; cached 1 h (`Cache-Control` + app cache; call `Cache::flush()` or wait to refresh). Both routes skip session/cookies.
+- Error pages 403/404/419/429/500/503 in `resources/views/errors` (translated, noindex). `Route::fallback` makes unknown URLs render the 404 page in the visitor's language.
+- `public/.htaccess`: `/build/*` is `immutable` for one year (Apache only); robots/sitemap keep a 1 h cache there.
+- Tests: `tests/Feature/Web/PublicPagesTest.php`, `PagesTranslationKeysTest.php`, `tests/Feature/Api/SupportTest.php`; `pages` is in the `TranslationParityTest` file list.

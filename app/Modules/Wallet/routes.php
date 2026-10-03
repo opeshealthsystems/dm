@@ -12,7 +12,7 @@ Route::prefix('v1')->group(function () {
         Route::get('wallet', [WalletController::class, 'show']);
         Route::get('wallet/entries', [WalletController::class, 'entries']);
         Route::get('payouts', [PayoutController::class, 'index']);
-        Route::post('payouts', [PayoutController::class, 'store']);
+        Route::post('payouts', [PayoutController::class, 'store'])->middleware('email.verified');
         Route::get('payouts/{payout}', [PayoutController::class, 'show'])->whereNumber('payout');
     });
 

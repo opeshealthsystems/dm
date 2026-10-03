@@ -5,6 +5,7 @@
 @section('content')
 <div x-data="buyerProfile()" x-init="load()" class="max-w-xl">
     <h1 class="mb-4 text-2xl font-medium">{{ __('buyer.profile.title') }}</h1>
+    <p class="mb-4"><a class="btn btn-sm" href="{{ route('account.security') }}">{{ __('security.page.title') }}</a></p>
 
     <p x-show="loading" class="text-ink-2" role="status">{{ __('common.loading') }}</p>
     <div x-show="error" x-cloak class="card mb-4 border-bad text-bad" role="alert">

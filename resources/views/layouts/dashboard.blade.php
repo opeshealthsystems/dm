@@ -1,5 +1,7 @@
 @extends('layouts.base')
 
+@section('robots', 'noindex,nofollow')
+
 @section('body')
 @php($items = config("navigation.$area"))
 <div x-data="{ open: false, desk: window.matchMedia('(min-width: 1024px)').matches }"
@@ -36,6 +38,7 @@
             @if ($area !== 'buyer')
                 <a class="link-tap mb-1 text-sm" href="{{ route('buyer.orders') }}">{{ __('common.area.buyer') }}</a>
             @endif
+            <a class="link-tap mb-1 text-sm" href="{{ route('account.security') }}">{{ __('security.page.title') }}</a>
             <form method="POST" action="{{ route('logout') }}">@csrf
                 <button class="btn btn-sm w-full" type="submit">{{ __('common.logout') }}</button>
             </form>
@@ -44,6 +47,7 @@
 
     <main class="min-w-0 p-4 sm:p-6 lg:p-8">
         <div class="mx-auto max-w-5xl">
+            @include('partials.account-banners')
             @yield('content')
         </div>
     </main>

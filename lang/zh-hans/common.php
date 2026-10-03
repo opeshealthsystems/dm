@@ -22,6 +22,7 @@ return [
     ],
 
     'nav' => [
+        'community' => '社区',
         'orders' => '订单',
         'cart' => '购物车',
         'messages' => '消息',
@@ -38,6 +39,7 @@ return [
         'payouts' => '提现',
         'settings' => '设置',
         'audit' => '审计日志',
+        'support' => '客服支持',
     ],
 
     'auth' => [

@@ -48,8 +48,12 @@ class BuyerPagesTest extends TestCase
     public function test_storefront_pages_are_public(): void
     {
         $this->get('/')->assertOk()->assertSee(__('buyer.store.title'))->assertSee('storeHome', false);
-        $this->get('/p/some-slug')->assertOk()->assertSee('productPage', false);
-        $this->get('/v/12')->assertOk()->assertSee('vendorPage', false);
+        $vendor = $this->user('vendor');
+        $product = $vendor->products()->create(['title' => 'Mug', 'price_cents' => 500, 'stock' => 1, 'status' => 'active']);
+        $this->get('/p/' . $product->slug)->assertOk()->assertSee('productPage', false);
+        $this->get('/p/some-slug')->assertNotFound();
+        $this->get('/v/' . $vendor->id)->assertOk()->assertSee('vendorPage', false);
+        $this->get('/v/9999')->assertNotFound();
         $this->get('/v/abc')->assertNotFound();
     }
 
@@ -61,8 +65,10 @@ class BuyerPagesTest extends TestCase
 
     public function test_product_page_receives_the_viewer_role(): void
     {
-        $this->get('/p/x')->assertSee("productPage('x', null)", false);
-        $this->actingAs($this->user('vendor'))->get('/p/x')->assertSee("productPage('x', 'vendor')", false);
+        $vendor = $this->user('vendor');
+        $slug = $vendor->products()->create(['title' => 'Mug', 'price_cents' => 500, 'stock' => 1, 'status' => 'active'])->slug;
+        $this->get("/p/$slug")->assertSee("productPage('$slug', null)", false);
+        $this->actingAs($vendor)->get("/p/$slug")->assertSee("productPage('$slug', 'vendor')", false);
     }
 
     public function test_views_use_logical_properties_and_no_raw_html_or_hex_colours(): void

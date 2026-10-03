@@ -36,6 +36,9 @@ Route::middleware(['auth:api', 'scopes:admin', 'throttle:api'])->prefix('admin')
     Route::get('orders', [OrderAdminController::class, 'index']);
     Route::get('orders/{order}', [OrderAdminController::class, 'show'])->whereNumber('order');
 
+    Route::get('support', [\App\Modules\ContentSeo\Http\Controllers\SupportAdminController::class, 'index']);
+    Route::post('support/{supportRequest}/handle', [\App\Modules\ContentSeo\Http\Controllers\SupportAdminController::class, 'handle'])->whereNumber('supportRequest');
+
     Route::get('settings', [SettingsController::class, 'show']);
     Route::put('settings', [SettingsController::class, 'update']);
 });

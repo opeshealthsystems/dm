@@ -1,12 +1,37 @@
 @extends('layouts.store')
 
-@section('title', __('buyer.product.page_title') . ' | ' . config('app.name'))
+@section('title', ($product->title ?: __('buyer.product.page_title')) . ' | ' . config('app.name'))
+@section('description', \App\Modules\ContentSeo\Support\Seo::limit(\App\Modules\ContentSeo\Support\Seo::productDescription($product)))
+@section('canonical_url', route('store.product', $product->slug))
+@section('og_type', 'product')
+@if (! $indexable)
+    @section('robots', 'noindex,nofollow')
+@endif
 
 @section('content')
+@include('partials.jsonld', ['schema' => \App\Modules\ContentSeo\Support\Seo::product($product, route('store.product', $product->slug))])
 <div x-data="productPage(@js($slug), @js(auth()->user()?->role))">
     <a href="{{ route('home') }}" class="back-link">{{ __('buyer.product.back') }}</a>
+    @include('partials.breadcrumbs', ['crumbs' => [[$product->title, route('store.product', $product->slug)]]])
 
-    <p x-show="loading" class="text-ink-2" role="status">{{ __('common.loading') }}</p>
+    {{-- Server-rendered copy for search engines and first paint; removed once Alpine has loaded the live data. --}}
+    <section x-effect="if (product) $el.remove()" class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div>
+            <h1 class="mb-2 text-2xl font-medium sm:text-3xl">{{ $product->title }}</h1>
+            <p class="mb-3 text-ink-2">{{ $product->rating_count > 0 ? __('buyer.shared.rating', ['avg' => number_format((float) $product->rating_avg, 1), 'count' => $product->rating_count]) : __('buyer.shared.no_ratings') }}</p>
+            <div class="whitespace-pre-line text-ink">{{ $product->description ?: __('buyer.product.no_description') }}</div>
+        </div>
+        <div class="card flex flex-col gap-3 self-start">
+            <div class="text-3xl font-medium">{{ \App\Modules\ContentSeo\Support\Seo::price((int) $product->price_cents, $product->currency) }}</div>
+            <div>
+                <span class="badge {{ $product->stock > 0 ? 'badge-ok' : 'badge-bad' }}">{{ $product->stock > 0 ? __('buyer.product.stock', ['count' => $product->stock]) : __('buyer.store.out_of_stock') }}</span>
+            </div>
+            <div class="border-t border-line pt-3">
+                <div class="text-sm text-ink-3">{{ __('buyer.product.sold_by') }}</div>
+                <a href="{{ route('store.vendor', $product->vendor_id) }}" class="font-medium">{{ $product->vendor?->shop_name ?: $product->vendor?->handle }}</a>
+            </div>
+        </div>
+    </section>
     <div x-show="error" x-cloak class="card border-bad text-bad" role="alert">
         <span x-text="error"></span>
         <button type="button" class="btn btn-sm ms-2" @click="init()">{{ __('buyer.shared.retry') }}</button>

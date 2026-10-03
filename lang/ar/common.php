@@ -22,6 +22,7 @@ return [
     ],
 
     'nav' => [
+        'community' => 'المجتمع',
         'orders' => 'الطلبات',
         'cart' => 'السلة',
         'messages' => 'الرسائل',
@@ -38,6 +39,7 @@ return [
         'payouts' => 'السحوبات',
         'settings' => 'الإعدادات',
         'audit' => 'سجل التدقيق',
+        'support' => 'الدعم',
     ],
 
     'auth' => [

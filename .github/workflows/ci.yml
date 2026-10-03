@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    name: Tests (${{ matrix.db }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        db: [sqlite, mysql]
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: dm_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot" --health-interval=5s --health-timeout=5s --health-retries=20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, gmp, pdo_mysql, pdo_sqlite, sodium, curl, intl
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+          npm ci
+          npm run build
+
+      - name: Prepare app
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan passport:keys --force
+
+      - name: Run tests on SQLite
+        if: matrix.db == 'sqlite'
+        run: php artisan test
+
+      # MySQL proves what SQLite cannot: real row locks (lockForUpdate), unique-index races and
+      # collation behaviour. Environment variables override the SQLite defaults in phpunit.xml.
+      - name: Run tests on MySQL
+        if: matrix.db == 'mysql'
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: dm_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test
+
+  hygiene:
+    name: Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No secrets, dumps or runtime files committed
+        run: |
+          if git ls-files | grep -E '(^|/)\.env$|\.sql$|\.zip$|oauth-(private|public)\.key$|storage/framework/(sessions|cache/data|views)/[^.]'; then
+            echo "Forbidden files are tracked"; exit 1
+          fi
+      - name: OpenAPI spec is committed
+        run: test -s docs/openapi.json

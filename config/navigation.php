@@ -31,5 +31,7 @@ return [
         ['label' => 'nav.payouts', 'route' => 'admin.payouts'],
         ['label' => 'nav.settings', 'route' => 'admin.settings'],
         ['label' => 'nav.audit', 'route' => 'admin.audit'],
+        ['label' => 'nav.community', 'route' => 'admin.community'],
+        ['label' => 'nav.support', 'route' => 'admin.support'],
     ],
 ];

@@ -1095,6 +1095,225 @@
                 }
             }
         },
+        "/v1/admin/support": {
+            "get": {
+                "operationId": "supportAdmin.index",
+                "description": "Filter with `status` (`new` or `handled`). Paginated.",
+                "summary": "List support requests, newest first. Requires `admin`",
+                "tags": [
+                    "Admin: Support",
+                    "SupportAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "subject": {
+                                                        "type": "string"
+                                                    },
+                                                    "message": {
+                                                        "type": "string"
+                                                    },
+                                                    "locale": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "handled_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "created_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "email",
+                                                    "subject",
+                                                    "message",
+                                                    "locale",
+                                                    "status",
+                                                    "handled_at",
+                                                    "created_at"
+                                                ]
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "last_page",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/support/{supportRequest}/handle": {
+            "post": {
+                "operationId": "supportAdmin.handle",
+                "summary": "Mark a support request as handled. Requires `admin`",
+                "tags": [
+                    "Admin: Support",
+                    "SupportAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "supportRequest",
+                        "in": "path",
+                        "required": true,
+                        "description": "The support request ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "subject": {
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "type": "string"
+                                                },
+                                                "locale": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "handled_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "created_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "subject",
+                                                "message",
+                                                "locale",
+                                                "status",
+                                                "handled_at",
+                                                "created_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/admin/users": {
             "get": {
                 "operationId": "userAdmin.index",
@@ -1875,7 +2094,7 @@
         "/v1/auth/login": {
             "post": {
                 "operationId": "auth.login",
-                "description": "Third-party integrations should use the OAuth 2.0 flows under `/oauth/*`.",
+                "description": "When the account has two-factor authentication enabled, also send `code` (a 6-digit\nauthenticator code) or `recovery_code`; without it the response is 422 with\n`code: two_factor_required`. Five failed attempts in 15 minutes lock the account\nfor the rest of the window (429, `Retry-After`).\n\nThird-party integrations should use the OAuth 2.0 flows under `/oauth/*`.",
                 "summary": "Log in with email and password and receive an access token (first-party apps)",
                 "tags": [
                     "Auth"
@@ -2003,25 +2222,6 @@
                                         "access_token",
                                         "scopes",
                                         "user"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "const": "This account is suspended."
-                                        }
-                                    },
-                                    "required": [
-                                        "message"
                                     ]
                                 }
                             }
@@ -2698,6 +2898,1580 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/v1/community/categories": {
+            "get": {
+                "operationId": "community.categories",
+                "summary": "List forum categories with thread and post counts (public)",
+                "tags": [
+                    "Community"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `App.Modules.Community.Http.Resources.CategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/App.Modules.Community.Http.Resources.CategoryResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/community/categories/{category}": {
+            "get": {
+                "operationId": "community.category",
+                "summary": "Show one category by slug (public)",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "description": "The category slug",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`App.Modules.Community.Http.Resources.CategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/App.Modules.Community.Http.Resources.CategoryResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            }
+        },
+        "/v1/community/categories/{category}/threads": {
+            "get": {
+                "operationId": "community.threads",
+                "summary": "List the threads of a category (public). Pinned threads come first, then the most recently\nactive. When signed in, each thread carries `is_unread`",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "description": "The category slug",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `ThreadResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ThreadResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "community.storeThread",
+                "description": "Rules: the account must be at least 5 minutes old; accounts under 24 hours old may use at\nmost 2 links; `staff_only` categories (announcements) accept admins only. `product` is the\npublic slug of one of your own active products. Rate limited per user.",
+                "summary": "Start a thread. Requires `profile`",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "description": "The category slug",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreThreadRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ThreadResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/ThreadResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "category"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/threads/{thread}": {
+            "get": {
+                "operationId": "community.thread",
+                "summary": "Show one thread (public). When signed in it also carries `is_subscribed` and `is_unread`",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ThreadResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/ThreadResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "category"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "communityAdmin.destroyThread",
+                "summary": "Soft delete a whole thread",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/threads/{thread}/posts": {
+            "get": {
+                "operationId": "community.posts",
+                "summary": "List the posts of a thread, oldest first (public). Deleted posts are not returned",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `PostResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PostResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "community.storePost",
+                "summary": "Reply to a thread. Requires `profile`. Locked threads only accept admin replies.\nSubscribers of the thread are notified. Rate limited per user",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StorePostRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`PostResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PostResource"
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "thread_path": {
+                                                    "type": "string"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "thread_path",
+                                                "last_page"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/posts/{post}": {
+            "get": {
+                "operationId": "community.post",
+                "summary": "Show one post including its raw markdown (public); used to prefill the edit form",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "description": "The post ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`PostResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PostResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "community.updatePost",
+                "summary": "Edit your own post within 15 minutes of posting. Requires `profile`",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "description": "The post ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StorePostRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`PostResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PostResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "community.destroyPost",
+                "summary": "Soft delete a post: the author (thread open) or an admin. Deleting the opening post removes the thread",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "description": "The post ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/posts/{post}/report": {
+            "post": {
+                "operationId": "community.report",
+                "summary": "Report a post to the moderators. Requires `profile`. One report per user and post;\nreasons: spam, abuse, illegal, off_topic, other",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "description": "The post ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportPostRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "status"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/threads/{thread}/subscription": {
+            "put": {
+                "operationId": "community.subscribe",
+                "summary": "Subscribe to a thread: replies create a notification for you. Requires `profile`",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "is_subscribed": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "is_subscribed"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "community.unsubscribe",
+                "summary": "Unsubscribe from a thread. Requires `profile`",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "is_subscribed": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "is_subscribed"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/threads/{thread}/read": {
+            "post": {
+                "operationId": "community.markRead",
+                "summary": "Mark a thread as read up to its latest post (clears the unread marker). Requires `profile`",
+                "tags": [
+                    "Community"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/threads/{thread}/pin": {
+            "post": {
+                "operationId": "communityAdmin.pin",
+                "summary": "Pin a thread to the top of its category",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ThreadResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ThreadResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "communityAdmin.unpin",
+                "summary": "Unpin a thread",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ThreadResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ThreadResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/threads/{thread}/lock": {
+            "post": {
+                "operationId": "communityAdmin.lock",
+                "summary": "Lock a thread: only admins can reply, authors can no longer edit or delete",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ThreadResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ThreadResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "communityAdmin.unlock",
+                "summary": "Unlock a thread",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "in": "path",
+                        "required": true,
+                        "description": "The thread ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ThreadResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ThreadResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/admin/categories": {
+            "get": {
+                "operationId": "communityAdmin.categories",
+                "summary": "All categories with counts (admin view)",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `App.Modules.Community.Http.Resources.CategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/App.Modules.Community.Http.Resources.CategoryResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "communityAdmin.storeCategory",
+                "summary": "Create a category. `slug` defaults to the slugified name. A custom `name` has no translations",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/App.Modules.Community.Http.Requests.CategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`App.Modules.Community.Http.Resources.CategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/App.Modules.Community.Http.Resources.CategoryResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/admin/categories/{category}": {
+            "put": {
+                "operationId": "communityAdmin.updateCategory",
+                "summary": "Update a category. Setting `name` replaces a translated default name",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "description": "The category ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/App.Modules.Community.Http.Requests.CategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`App.Modules.Community.Http.Resources.CategoryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/App.Modules.Community.Http.Resources.CategoryResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "communityAdmin.destroyCategory",
+                "summary": "Delete a category. Refused (409) while it still has threads",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "description": "The category ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/admin/reports": {
+            "get": {
+                "operationId": "communityAdmin.reports",
+                "summary": "The report queue, newest first. Filter with `status` = open (default), dismissed, actioned or all",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "open"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `ReportResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ReportResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/community/admin/reports/{report}/resolve": {
+            "post": {
+                "operationId": "communityAdmin.resolveReport",
+                "summary": "Resolve a report: `dismiss` closes it; `remove_post` soft-deletes the post and closes every\nopen report on it",
+                "tags": [
+                    "Community: Admin",
+                    "CommunityAdmin"
+                ],
+                "parameters": [
+                    {
+                        "name": "report",
+                        "in": "path",
+                        "required": true,
+                        "description": "The report ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResolveReportRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ReportResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReportResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -3882,6 +5656,59 @@
                 }
             }
         },
+        "/v1/auth/email/resend": {
+            "post": {
+                "operationId": "emailVerification.resend",
+                "description": "Rate limited (3 per 10 minutes). Does nothing if the address is already verified.\nUnverified accounts can browse and buy but cannot request payouts or publish products.",
+                "summary": "Resend the e-mail verification link. Requires `profile`",
+                "tags": [
+                    "EmailVerification"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "Verification email sent. Check your inbox."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "Your email address is already verified."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/fees": {
             "get": {
                 "operationId": "fee.index",
@@ -4607,7 +6434,7 @@
         },
         "/v1/orders": {
             "get": {
-                "operationId": "modules.orders.order.index_36",
+                "operationId": "modules.orders.order.index_45",
                 "description": "`role=buyer` (default) lists orders you placed; `role=vendor` lists orders placed with\nyour shop. Optional `status` filter. Paginated, newest first.",
                 "summary": "List your orders",
                 "tags": [
@@ -4825,7 +6652,7 @@
         },
         "/v1/orders/{order}": {
             "get": {
-                "operationId": "modules.orders.order.show_37",
+                "operationId": "modules.orders.order.show_46",
                 "summary": "Show one of your orders",
                 "tags": [
                     "Order"
@@ -5074,7 +6901,7 @@
         },
         "/v1/developer/orders": {
             "get": {
-                "operationId": "modules.orders.order.index_81",
+                "operationId": "modules.orders.order.index_90",
                 "description": "`role=buyer` (default) lists orders you placed; `role=vendor` lists orders placed with\nyour shop. Optional `status` filter. Paginated, newest first.",
                 "summary": "List your orders",
                 "tags": [
@@ -5228,7 +7055,7 @@
         },
         "/v1/developer/orders/{order}": {
             "get": {
-                "operationId": "modules.orders.order.show_82",
+                "operationId": "modules.orders.order.show_91",
                 "summary": "Show one of your orders",
                 "tags": [
                     "Order"
@@ -5281,6 +7108,94 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/forgot-password": {
+            "post": {
+                "operationId": "passwordReset.forgot",
+                "description": "Always answers 200 with the same message, whether or not the e-mail belongs to an account,\nso it cannot be used to find out who is registered. The link is valid for 60 minutes and\nworks once. Rate limited per IP and per e-mail.",
+                "summary": "Request a password reset link",
+                "tags": [
+                    "PasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "If an account exists for that email, a reset link is on its way. It works for 60 minutes."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/reset-password": {
+            "post": {
+                "operationId": "passwordReset.reset",
+                "description": "A wrong, expired (60 minutes) or already used token gives 422 `invalid_token`. On success\nthe password changes and every access token, refresh token and browser session of the\naccount is revoked, so the user must log in again everywhere.",
+                "summary": "Set a new password with the token from the e-mail",
+                "tags": [
+                    "PasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResetPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "Your password was changed. Log in with your new password."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -5952,7 +7867,7 @@
         },
         "/v1/products": {
             "get": {
-                "operationId": "modules.catalog.product.index_29",
+                "operationId": "modules.catalog.product.index_38",
                 "description": "Filter with `category_id`, `vendor_id`, `q` (title search). Paginated.",
                 "summary": "List active products (public)",
                 "tags": [
@@ -6528,7 +8443,7 @@
         },
         "/v1/developer/catalog/products": {
             "get": {
-                "operationId": "modules.catalog.product.index_80",
+                "operationId": "modules.catalog.product.index_89",
                 "description": "Filter with `category_id`, `vendor_id`, `q` (title search). Paginated.",
                 "summary": "List active products (public)",
                 "tags": [
@@ -7530,6 +9445,351 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support": {
+            "post": {
+                "operationId": "support.store",
+                "description": "Fields: `name`, `email`, `subject`, `message` (10-5000 characters). The hidden `website`\nfield is a honeypot: it must stay empty. Returns 201 when the request was received.",
+                "summary": "Send a support request. Public, rate limited",
+                "tags": [
+                    "Support"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 190
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "maxLength": 150
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "minLength": 10,
+                                        "maxLength": 5000
+                                    },
+                                    "website": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 500
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "subject",
+                                    "message"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "received": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "received"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/2fa": {
+            "get": {
+                "operationId": "twoFactor.show",
+                "summary": "Two-factor status: `enabled` and how many recovery codes are left",
+                "tags": [
+                    "TwoFactor"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "pending_setup": {
+                                                    "type": "string"
+                                                },
+                                                "recovery_codes_remaining": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "enabled",
+                                                "pending_setup",
+                                                "recovery_codes_remaining"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/2fa/setup": {
+            "post": {
+                "operationId": "twoFactor.setup",
+                "summary": "Start setup. Returns the base32 `secret` and an `otpauth_uri` (for authenticator apps / QR\ngenerators). Calling it again replaces an unconfirmed secret. 409 if 2FA is already on",
+                "tags": [
+                    "TwoFactor"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "secret": {
+                                                    "type": "string"
+                                                },
+                                                "otpauth_uri": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "secret",
+                                                "otpauth_uri"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/2fa/confirm": {
+            "post": {
+                "operationId": "twoFactor.confirm",
+                "summary": "Confirm setup with a code from the app. Turns 2FA on and returns 10 single-use\n`recovery_codes`. They are shown only this once",
+                "tags": [
+                    "TwoFactor"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TwoFactorCodeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "recovery_codes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "enabled",
+                                                "recovery_codes"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/2fa/disable": {
+            "post": {
+                "operationId": "twoFactor.disable",
+                "summary": "Turn 2FA off. Needs the account `password` and a current `code` (or a `recovery_code`)",
+                "tags": [
+                    "TwoFactor"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TwoFactorDisableRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "enabled"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/2fa/recovery-codes": {
+            "post": {
+                "operationId": "twoFactor.recoveryCodes",
+                "summary": "Replace all recovery codes. Needs `password` and a current `code`. The old codes stop working",
+                "tags": [
+                    "TwoFactor"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TwoFactorDisableRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "recovery_codes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "recovery_codes"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -8652,6 +10912,88 @@
                 ],
                 "title": "ApiKeyUsage"
             },
+            "App.Modules.Community.Http.Requests.CategoryRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "slug": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                        "maxLength": 64
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    },
+                    "position": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535
+                    },
+                    "staff_only": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "title": "App.Modules.Community.Http.Requests.CategoryRequest"
+            },
+            "App.Modules.Community.Http.Resources.CategoryResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "name_key": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "description_key": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "string"
+                    },
+                    "staff_only": {
+                        "type": "string"
+                    },
+                    "threads_count": {
+                        "type": "integer"
+                    },
+                    "posts_count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "name_key",
+                    "description",
+                    "description_key",
+                    "position",
+                    "staff_only"
+                ],
+                "title": "App.Modules.Community.Http.Resources.CategoryResource"
+            },
             "ArchiveProductRequest": {
                 "type": "object",
                 "description": "Force-archiving a product requires a reason.",
@@ -8754,6 +11096,34 @@
                     "created_at"
                 ],
                 "title": "AuditLogResource"
+            },
+            "AuthorResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "handle": {
+                        "type": "string"
+                    },
+                    "badge": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "enum": [
+                            "staff",
+                            "verified_vendor",
+                            null
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "handle",
+                    "badge"
+                ],
+                "title": "AuthorResource"
             },
             "CartItemRequest": {
                 "type": "object",
@@ -9125,6 +11495,20 @@
                 ],
                 "title": "DisputeResource"
             },
+            "ForgotPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email"
+                ],
+                "title": "ForgotPasswordRequest"
+            },
             "LoginRequest": {
                 "type": "object",
                 "properties": {
@@ -9134,6 +11518,21 @@
                     },
                     "password": {
                         "type": "string"
+                    },
+                    "code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Second factor, only needed when the account has 2FA enabled.",
+                        "maxLength": 16
+                    },
+                    "recovery_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 32
                     }
                 },
                 "required": [
@@ -9554,6 +11953,68 @@
                 ],
                 "title": "PayoutRequestResource"
             },
+            "PostResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "thread_id": {
+                        "type": "string"
+                    },
+                    "author": {
+                        "$ref": "#/components/schemas/AuthorResource"
+                    },
+                    "body": {
+                        "type": "string",
+                        "description": "Raw markdown (for the edit form) and the sanitised HTML produced by MarkdownLite."
+                    },
+                    "body_html": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "edited_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "viewer": {
+                        "type": "object",
+                        "properties": {
+                            "can_edit": {
+                                "type": "boolean"
+                            },
+                            "can_delete": {
+                                "type": "boolean"
+                            },
+                            "can_report": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "can_edit",
+                            "can_delete",
+                            "can_report"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "thread_id",
+                    "body",
+                    "body_html",
+                    "created_at",
+                    "edited_at",
+                    "viewer"
+                ],
+                "title": "PostResource"
+            },
             "ProductRequest": {
                 "type": "object",
                 "properties": {
@@ -9783,6 +12244,158 @@
                 ],
                 "title": "ReplyRequest"
             },
+            "ReportPostRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "enum": [
+                            "spam",
+                            "abuse",
+                            "illegal",
+                            "off_topic",
+                            "other"
+                        ]
+                    },
+                    "note": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "reason"
+                ],
+                "title": "ReportPostRequest"
+            },
+            "ReportResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                    "note": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "reporter": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "handle": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "handle"
+                        ]
+                    },
+                    "post": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "thread_id": {
+                                "type": "string"
+                            },
+                            "thread_title": {
+                                "type": "string"
+                            },
+                            "thread_path": {
+                                "type": "string"
+                            },
+                            "excerpt": {
+                                "type": "string"
+                            },
+                            "author_handle": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "plain text; clients must escape it"
+                            },
+                            "is_deleted": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "thread_id",
+                            "thread_title",
+                            "thread_path",
+                            "excerpt",
+                            "author_handle",
+                            "is_deleted"
+                        ]
+                    },
+                    "resolved_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "reason",
+                    "note",
+                    "status",
+                    "post",
+                    "resolved_at",
+                    "created_at"
+                ],
+                "title": "ReportResource"
+            },
+            "ResetPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "token": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "token",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "ResetPasswordRequest"
+            },
             "ResolveDisputeRequest": {
                 "type": "object",
                 "properties": {
@@ -9804,6 +12417,22 @@
                     "resolution"
                 ],
                 "title": "ResolveDisputeRequest"
+            },
+            "ResolveReportRequest": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "dismiss",
+                            "remove_post"
+                        ]
+                    }
+                },
+                "required": [
+                    "action"
+                ],
+                "title": "ResolveReportRequest"
             },
             "ReviewResource": {
                 "type": "object",
@@ -10071,6 +12700,21 @@
                 ],
                 "title": "StorePayoutRequest"
             },
+            "StorePostRequest": {
+                "type": "object",
+                "description": "Used for new replies and for edits.",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 10000
+                    }
+                },
+                "required": [
+                    "body"
+                ],
+                "title": "StorePostRequest"
+            },
             "StoreReviewRequest": {
                 "type": "object",
                 "properties": {
@@ -10096,6 +12740,34 @@
                 ],
                 "title": "StoreReviewRequest"
             },
+            "StoreThreadRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 150
+                    },
+                    "body": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 10000
+                    },
+                    "product": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Public slug of one of the author's own active products.",
+                        "maxLength": 190
+                    }
+                },
+                "required": [
+                    "title",
+                    "body"
+                ],
+                "title": "StoreThreadRequest"
+            },
             "StoreVendorFeeRequest": {
                 "type": "object",
                 "properties": {
@@ -10108,6 +12780,166 @@
                     }
                 },
                 "title": "StoreVendorFeeRequest"
+            },
+            "ThreadResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "name_key": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "slug",
+                            "name",
+                            "name_key"
+                        ]
+                    },
+                    "author": {
+                        "$ref": "#/components/schemas/AuthorResource"
+                    },
+                    "product": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "slug",
+                            "title"
+                        ]
+                    },
+                    "is_pinned": {
+                        "type": "string"
+                    },
+                    "is_locked": {
+                        "type": "string"
+                    },
+                    "posts_count": {
+                        "type": "string"
+                    },
+                    "replies_count": {},
+                    "last_posted_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "is_unread": {
+                        "type": "boolean"
+                    },
+                    "is_subscribed": {
+                        "type": "boolean"
+                    },
+                    "viewer": {
+                        "type": "object",
+                        "properties": {
+                            "can_reply": {
+                                "type": "boolean"
+                            },
+                            "is_admin": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "can_reply",
+                            "is_admin"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "title",
+                    "slug",
+                    "path",
+                    "is_pinned",
+                    "is_locked",
+                    "posts_count",
+                    "replies_count",
+                    "last_posted_at",
+                    "created_at",
+                    "viewer"
+                ],
+                "title": "ThreadResource"
+            },
+            "TwoFactorCodeRequest": {
+                "type": "object",
+                "description": "A TOTP code (confirm setup).",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "maxLength": 16
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "title": "TwoFactorCodeRequest"
+            },
+            "TwoFactorDisableRequest": {
+                "type": "object",
+                "description": "Password plus a TOTP code or recovery code.",
+                "properties": {
+                    "password": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 16
+                    },
+                    "recovery_code": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 32
+                    }
+                },
+                "required": [
+                    "password"
+                ],
+                "title": "TwoFactorDisableRequest"
             },
             "UpdateProfileRequest": {
                 "type": "object",
@@ -10168,6 +13000,12 @@
                             "null"
                         ]
                     },
+                    "email_verified": {
+                        "type": "boolean"
+                    },
+                    "two_factor_enabled": {
+                        "type": "boolean"
+                    },
                     "is_verified_vendor": {
                         "type": "boolean"
                     },
@@ -10189,6 +13027,8 @@
                     "role",
                     "shop_name",
                     "shop_description",
+                    "email_verified",
+                    "two_factor_enabled",
                     "is_verified_vendor",
                     "rating_avg",
                     "rating_count"

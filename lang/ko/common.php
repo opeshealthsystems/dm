@@ -22,6 +22,7 @@ return [
     ],
 
     'nav' => [
+        'community' => '커뮤니티',
         'orders' => '주문',
         'cart' => '장바구니',
         'messages' => '메시지',
@@ -38,6 +39,7 @@ return [
         'payouts' => '출금',
         'settings' => '설정',
         'audit' => '감사 로그',
+        'support' => '고객 지원',
     ],
 
     'auth' => [

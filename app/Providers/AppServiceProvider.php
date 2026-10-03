@@ -87,6 +87,12 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)
             ->by($request->user()?->getAuthIdentifier() ?: $request->ip()));
 
+        // Public contact form: a few messages per visitor, then wait.
+        RateLimiter::for('support', fn (Request $request) => [
+            Limit::perMinute(5)->by('support|' . $request->ip()),
+            Limit::perHour(20)->by('support-h|' . $request->ip()),
+        ]);
+
         // Brute-force protection for register/login.
         RateLimiter::for('auth', fn (Request $request) => [
             Limit::perMinute(10)->by($request->ip()),

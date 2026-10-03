@@ -2,7 +2,11 @@
 
 @section('title', __('buyer.store.title') . ' | ' . config('app.name'))
 
+@section('description', __('pages.seo.home_description'))
+
 @section('content')
+@include('partials.jsonld', ['schema' => \App\Modules\ContentSeo\Support\Seo::organization()])
+@include('partials.jsonld', ['schema' => \App\Modules\ContentSeo\Support\Seo::website()])
 <div x-data="storeHome()">
     <h1 class="mb-1 text-2xl font-medium sm:text-3xl">{{ __('buyer.store.title') }}</h1>
     <p class="mb-5 max-w-xl text-ink-2">{{ __('buyer.store.subtitle') }}</p>
