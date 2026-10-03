@@ -11,7 +11,7 @@ use Tests\TestCase;
  */
 class TranslationParityTest extends TestCase
 {
-    private const FILES = ['common', 'buyer', 'seller', 'admin', 'community', 'security', 'pages'];
+    private const FILES = ['common', 'buyer', 'seller', 'admin', 'demo', 'community', 'security', 'pages'];
 
     private function load(string $locale, string $file): array
     {

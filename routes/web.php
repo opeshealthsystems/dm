@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\DemoLoginController;
 use App\Http\Controllers\Web\PageController;
 use App\Http\Controllers\Web\StorefrontController;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:auth');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:auth');
+    // Local-only one-click demo sign-in (404 unless APP_ENV=local and DEMO_LOGIN=true).
+    Route::post('/demo-login/{role}', DemoLoginController::class)->whereIn('role', ['admin', 'seller', 'buyer'])->name('demo-login');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');

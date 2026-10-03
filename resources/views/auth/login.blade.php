@@ -21,4 +21,18 @@
     <button class="btn btn-primary" type="submit">{{ __('common.auth.login') }}</button>
 </form>
 <p class="mt-4 text-center text-sm text-ink-2">{{ __('common.auth.no_account') }} <a href="{{ route('register') }}">{{ __('common.auth.register') }}</a></p>
+
+@if (\App\Http\Controllers\Web\DemoLoginController::enabled())
+    <section class="mt-6 border-t border-line pt-4" aria-labelledby="demo-title">
+        <h2 id="demo-title" class="text-sm font-medium">{{ __('demo.title') }}</h2>
+        <p class="mb-3 text-xs text-ink-3">{{ __('demo.hint') }}</p>
+        <div class="grid gap-2 sm:grid-cols-3">
+            @foreach (['admin', 'seller', 'buyer'] as $demoRole)
+                <form method="POST" action="{{ route('demo-login', $demoRole) }}">@csrf
+                    <button type="submit" class="btn btn-sm w-full">{{ __("demo.$demoRole") }}</button>
+                </form>
+            @endforeach
+        </div>
+    </section>
+@endif
 @endsection
