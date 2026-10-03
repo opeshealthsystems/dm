@@ -26,6 +26,7 @@ class OrderResource extends JsonResource
             'payment_method' => $this->payment_method,
             'tracking_number' => $this->tracking_number,
             'shipping_address' => $this->when($canSeeAddress, $this->shipping_address),
+            'vendor' => $this->whenLoaded('vendor', fn () => ['id' => $this->vendor_id, 'handle' => $this->vendor->handle, 'shop_name' => $this->vendor->shop_name]),
             'buyer_id' => $this->buyer_id,
             'vendor_id' => $this->vendor_id,
             'items' => $this->whenLoaded('items', fn () => $this->items->map(fn ($i) => [

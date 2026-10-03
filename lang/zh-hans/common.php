@@ -1,0 +1,79 @@
+<?php
+
+return [
+    'language' => '语言',
+    'menu' => '菜单',
+    'logout' => '退出登录',
+    'my_account' => '我的账户',
+    'coming_soon' => '此页面正在建设中。',
+    'save' => '保存',
+    'cancel' => '取消',
+    'back' => '返回',
+    'search' => '搜索',
+    'loading' => '加载中…',
+    'empty' => '这里还没有内容。',
+    'error' => '出了点问题，请重试。',
+    'confirm' => '确定吗？',
+
+    'area' => [
+        'buyer' => '买家账户',
+        'seller' => '卖家账户',
+        'admin' => '管理员',
+    ],
+
+    'nav' => [
+        'orders' => '订单',
+        'cart' => '购物车',
+        'messages' => '消息',
+        'following' => '关注',
+        'profile' => '个人资料',
+        'overview' => '概览',
+        'products' => '商品',
+        'wallet' => '钱包',
+        'reviews' => '评价',
+        'developers' => '开发者',
+        'users' => '用户',
+        'catalog' => '商品目录',
+        'disputes' => '纠纷',
+        'payouts' => '提现',
+        'settings' => '设置',
+        'audit' => '审计日志',
+    ],
+
+    'auth' => [
+        'login' => '登录',
+        'register' => '创建账户',
+        'email' => '邮箱',
+        'password' => '密码',
+        'name' => '您的姓名',
+        'remember' => '保持登录状态',
+        'no_account' => '第一次来？',
+        'have_account' => '已有账户？',
+        'account_type' => '我想',
+        'buyer' => '购买',
+        'seller' => '出售',
+        'shop_name' => '店铺名称',
+        'password_hint' => '至少 10 个字符，须包含字母和数字。',
+        'failed' => '这些信息与我们的记录不匹配。',
+        'suspended' => '此账户已被暂停。',
+    ],
+
+    'home' => [
+        'title' => '从独立卖家处选购',
+        'subtitle' => '在您确认收货之前，每笔订单都由托管（escrow）保护。',
+        'empty' => '暂无商品，请稍后再来。',
+    ],
+
+    'confirm_ok' => '确认',
+    'date' => '日期',
+
+    'status' => [
+        'label' => '状态',
+        'pending_payment' => '待付款',
+        'paid' => '已付款',
+        'shipped' => '已发货',
+        'completed' => '已完成',
+        'cancelled' => '已取消',
+        'disputed' => '纠纷中',
+    ],
+];

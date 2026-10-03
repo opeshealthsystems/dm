@@ -4,8 +4,10 @@ namespace App\Modules\Identity\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Modules\Identity\Http\Requests\ChangePasswordRequest;
 use App\Modules\Identity\Http\Requests\LoginRequest;
 use App\Modules\Identity\Http\Requests\RegisterRequest;
+use App\Modules\Identity\Http\Requests\UpdateProfileRequest;
 use App\Modules\Identity\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,6 +57,37 @@ class AuthController extends Controller
     public function me(Request $request): UserResource
     {
         return new UserResource($request->user());
+    }
+
+    /**
+     * Update your profile (name, handle, shop name and description). Requires `profile`.
+     *
+     * Only the fields you send are changed. Shop fields are ignored for buyers.
+     */
+    public function updateMe(UpdateProfileRequest $request): UserResource
+    {
+        $user = $request->user();
+        $data = $request->validated();
+        if ($user->role !== User::ROLE_VENDOR) {
+            unset($data['shop_name'], $data['shop_description']);
+        }
+        $user->fill($data)->save();
+
+        return new UserResource($user->refresh());
+    }
+
+    /**
+     * Change your password. Requires `profile`.
+     *
+     * Needs the current password and a new one (confirmed, 10+ characters, letters and numbers).
+     */
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->password = $request->validated('password');
+        $user->save();
+
+        return response()->json(['message' => 'Password updated.']);
     }
 
     /** Revoke the current access token. */

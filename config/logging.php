@@ -65,6 +65,15 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Payment audit trail (legacy logs/payments.log): money events only, addresses masked.
+        'payments' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/payments.log'),
+            'level' => 'info',
+            'days' => 365,
+            'replace_placeholders' => true,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

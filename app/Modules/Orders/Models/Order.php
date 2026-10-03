@@ -14,6 +14,8 @@ class Order extends Model
     public const STATUS_SHIPPED = 'shipped';
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_CANCELLED = 'cancelled';
+    /** Frozen by an open dispute; only an admin resolution (refund / releaseToVendor) moves it on. */
+    public const STATUS_DISPUTED = 'disputed';
 
     public const ESCROW_PENDING = 'pending';
     public const ESCROW_HELD = 'held';

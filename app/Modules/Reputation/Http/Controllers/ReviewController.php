@@ -93,6 +93,23 @@ class ReviewController extends Controller
         return new ReviewResource($this->service->unvote($request->user(), $review));
     }
 
+    /**
+     * Vendors you follow. Requires `profile`.
+     *
+     * Newest follow first. Paginated.
+     */
+    public function following(Request $request): AnonymousResourceCollection
+    {
+        $vendors = User::query()
+            ->join('vendor_follows', 'vendor_follows.vendor_id', '=', 'users.id')
+            ->where('vendor_follows.follower_id', $request->user()->id)
+            ->orderByDesc('vendor_follows.id')
+            ->select('users.*')
+            ->paginate(min($request->integer('per_page', 50), 100));
+
+        return VendorProfileResource::collection($vendors);
+    }
+
     /** Follow a vendor. Idempotent. */
     public function follow(Request $request, User $vendor): JsonResponse
     {

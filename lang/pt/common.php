@@ -1,0 +1,79 @@
+<?php
+
+return [
+    'language' => 'Idioma',
+    'menu' => 'Menu',
+    'logout' => 'Terminar sessão',
+    'my_account' => 'A minha conta',
+    'coming_soon' => 'Esta página está em construção.',
+    'save' => 'Guardar',
+    'cancel' => 'Cancelar',
+    'back' => 'Voltar',
+    'search' => 'Pesquisar',
+    'loading' => 'A carregar…',
+    'empty' => 'Ainda não há nada aqui.',
+    'error' => 'Ocorreu um erro. Tente novamente.',
+    'confirm' => 'Tem a certeza?',
+
+    'area' => [
+        'buyer' => 'Conta de comprador',
+        'seller' => 'Conta de vendedor',
+        'admin' => 'Admin',
+    ],
+
+    'nav' => [
+        'orders' => 'Encomendas',
+        'cart' => 'Carrinho',
+        'messages' => 'Mensagens',
+        'following' => 'A seguir',
+        'profile' => 'Perfil',
+        'overview' => 'Resumo',
+        'products' => 'Produtos',
+        'wallet' => 'Carteira',
+        'reviews' => 'Avaliações',
+        'developers' => 'Programadores',
+        'users' => 'Utilizadores',
+        'catalog' => 'Catálogo',
+        'disputes' => 'Disputas',
+        'payouts' => 'Levantamentos',
+        'settings' => 'Definições',
+        'audit' => 'Registo de auditoria',
+    ],
+
+    'auth' => [
+        'login' => 'Iniciar sessão',
+        'register' => 'Criar conta',
+        'email' => 'Email',
+        'password' => 'Palavra-passe',
+        'name' => 'O seu nome',
+        'remember' => 'Manter sessão iniciada',
+        'no_account' => 'É novo por aqui?',
+        'have_account' => 'Já tem uma conta?',
+        'account_type' => 'Quero',
+        'buyer' => 'Comprar',
+        'seller' => 'Vender',
+        'shop_name' => 'Nome da loja',
+        'password_hint' => 'Pelo menos 10 caracteres, com letras e números.',
+        'failed' => 'Estes dados não correspondem aos nossos registos.',
+        'suspended' => 'Esta conta está suspensa.',
+    ],
+
+    'home' => [
+        'title' => 'Compre a vendedores independentes',
+        'subtitle' => 'Cada encomenda fica protegida por escrow até confirmar a entrega.',
+        'empty' => 'Ainda não há produtos. Volte em breve.',
+    ],
+
+    'confirm_ok' => 'Confirmar',
+    'date' => 'Data',
+
+    'status' => [
+        'label' => 'Estado',
+        'pending_payment' => 'A aguardar pagamento',
+        'paid' => 'Pago',
+        'shipped' => 'Enviado',
+        'completed' => 'Concluído',
+        'cancelled' => 'Cancelado',
+        'disputed' => 'Em disputa',
+    ],
+];

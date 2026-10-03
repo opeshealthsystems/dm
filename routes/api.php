@@ -25,17 +25,22 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:api', 'throttle:api'])->group(function () {
         Route::get('auth/me', [AuthController::class, 'me'])->middleware('scopes:profile');
+        Route::put('auth/me', [AuthController::class, 'updateMe'])->middleware('scopes:profile');
+        Route::post('auth/password', [AuthController::class, 'changePassword'])->middleware('scopes:profile');
         Route::post('auth/logout', [AuthController::class, 'logout']);
     });
 
     // --- Catalog: public reads -----------------------------------------
     Route::middleware('throttle:api')->group(function () {
+        Route::get('categories', [\App\Modules\Catalog\Http\Controllers\CategoryController::class, 'index']);
         Route::get('products', [ProductController::class, 'index']);
         Route::get('products/{slug}', [ProductController::class, 'show']);
     });
 
     // --- Catalog: vendor writes (OAuth scope `catalog:write`) ----------
     Route::middleware(['auth:api', 'scopes:catalog:write', 'throttle:api'])->group(function () {
+        Route::get('vendor/products', [ProductController::class, 'mine']);
+        Route::get('vendor/products/{product}', [ProductController::class, 'mineShow'])->whereNumber('product');
         Route::post('products', [ProductController::class, 'store']);
         Route::put('products/{product}', [ProductController::class, 'update']);
         Route::delete('products/{product}', [ProductController::class, 'destroy']);
@@ -45,6 +50,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api', 'scopes:orders:read', 'throttle:api'])->group(function () {
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('orders/{order}', [OrderController::class, 'show']);
+        Route::get('orders/{order}/payment', [\App\Modules\Payments\Http\Controllers\PaymentController::class, 'show'])->whereNumber('order');
     });
 
     // --- Cart + buyer order actions (scope `orders:write`) --------------
@@ -84,6 +90,7 @@ Route::prefix('v1')->group(function () {
 
     // --- Reputation: follow + helpful votes (scope `profile`) -----------
     Route::middleware(['auth:api', 'scopes:profile', 'throttle:api'])->group(function () {
+        Route::get('following', [ReviewController::class, 'following']);
         Route::post('vendors/{vendor}/follow', [ReviewController::class, 'follow'])->whereNumber('vendor');
         Route::delete('vendors/{vendor}/follow', [ReviewController::class, 'unfollow'])->whereNumber('vendor');
         Route::post('reviews/{review}/helpful', [ReviewController::class, 'vote'])->whereNumber('review');
@@ -137,3 +144,6 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+
+// Admin module routes (/api/v1/admin/*)
+Route::prefix('v1')->group(base_path('app/Modules/Admin/routes.php'));

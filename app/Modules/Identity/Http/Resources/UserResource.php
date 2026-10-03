@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'role' => $this->role,
             'shop_name' => $this->shop_name,
+            'shop_description' => $this->shop_description,
             'is_verified_vendor' => $this->is_verified_vendor,
             'rating_avg' => $this->rating_avg === null ? null : (float) $this->rating_avg,
             'rating_count' => (int) $this->rating_count,

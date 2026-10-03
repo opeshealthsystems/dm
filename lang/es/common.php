@@ -1,0 +1,79 @@
+<?php
+
+return [
+    'language' => 'Idioma',
+    'menu' => 'Menú',
+    'logout' => 'Cerrar sesión',
+    'my_account' => 'Mi cuenta',
+    'coming_soon' => 'Esta página está en construcción.',
+    'save' => 'Guardar',
+    'cancel' => 'Cancelar',
+    'back' => 'Volver',
+    'search' => 'Buscar',
+    'loading' => 'Cargando…',
+    'empty' => 'Aún no hay nada aquí.',
+    'error' => 'Algo salió mal. Inténtalo de nuevo.',
+    'confirm' => '¿Estás seguro?',
+
+    'area' => [
+        'buyer' => 'Cuenta de comprador',
+        'seller' => 'Cuenta de vendedor',
+        'admin' => 'Administración',
+    ],
+
+    'nav' => [
+        'orders' => 'Pedidos',
+        'cart' => 'Carrito',
+        'messages' => 'Mensajes',
+        'following' => 'Siguiendo',
+        'profile' => 'Perfil',
+        'overview' => 'Resumen',
+        'products' => 'Productos',
+        'wallet' => 'Monedero',
+        'reviews' => 'Reseñas',
+        'developers' => 'Desarrolladores',
+        'users' => 'Usuarios',
+        'catalog' => 'Catálogo',
+        'disputes' => 'Disputas',
+        'payouts' => 'Pagos',
+        'settings' => 'Ajustes',
+        'audit' => 'Registro de auditoría',
+    ],
+
+    'auth' => [
+        'login' => 'Iniciar sesión',
+        'register' => 'Crear cuenta',
+        'email' => 'Correo electrónico',
+        'password' => 'Contraseña',
+        'name' => 'Tu nombre',
+        'remember' => 'Mantener la sesión iniciada',
+        'no_account' => '¿Eres nuevo?',
+        'have_account' => '¿Ya tienes una cuenta?',
+        'account_type' => 'Quiero',
+        'buyer' => 'Comprar',
+        'seller' => 'Vender',
+        'shop_name' => 'Nombre de la tienda',
+        'password_hint' => 'Al menos 10 caracteres, con letras y números.',
+        'failed' => 'Estos datos no coinciden con nuestros registros.',
+        'suspended' => 'Esta cuenta está suspendida.',
+    ],
+
+    'home' => [
+        'title' => 'Compra a vendedores independientes',
+        'subtitle' => 'Cada pedido está protegido por depósito en garantía (escrow) hasta que confirmes la entrega.',
+        'empty' => 'Aún no hay productos. Vuelve pronto.',
+    ],
+
+    'confirm_ok' => 'Confirmar',
+    'date' => 'Fecha',
+
+    'status' => [
+        'label' => 'Estado',
+        'pending_payment' => 'Pendiente de pago',
+        'paid' => 'Pagado',
+        'shipped' => 'Enviado',
+        'completed' => 'Completado',
+        'cancelled' => 'Cancelado',
+        'disputed' => 'En disputa',
+    ],
+];

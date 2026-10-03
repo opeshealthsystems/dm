@@ -13,7 +13,31 @@ deployment = many vendors, one owner.
 Hard requirement from the owner: **payments and escrow must never break.** Port them
 only behind tests that pin the existing behaviour.
 
-## Current state (all tests green: 63 tests, 376 assertions; 54 `/api/v1` routes)
+## Open blockers (need the owner)
+
+1. **GitHub push is blocked on authentication.** The credential manager waits for an
+   interactive login on the owner's PC, so pushes from an unattended session hang. Fix:
+   sign in once (`git push` from a terminal, or GitHub Desktop); then pushes work.
+   Local commits are safe; nothing is lost.
+2. **MySQL was stopped** (Laragon closed). Tests use in-memory SQLite and pass; start
+   Laragon, then run `php artisan migrate` and `php artisan db:seed` against a real DB.
+3. **Real-chain verification is not done.** Bitcoin/Monero code is tested with faked HTTP.
+   Before real money: run on Bitcoin testnet and a Monero stagenet wallet-rpc, and run the
+   test suite on MySQL (row locks cannot be proven on SQLite).
+4. **Legacy payment source is not in this repo** (see "Legacy reference"). Only needed if
+   behaviour has to be re-compared with the old app.
+5. **Legacy data import** is not written; decide whether old users/orders must carry over.
+
+## Security notes
+
+- Scope checks are role-aware (`RequireScopes`, `RequireAnyScope`): a browser session token
+  carries every scope, so the user's role must also allow the scope (`User::allowedScopes`).
+  Covered by `AdminUiTest`. Always use `scopes:` / `scope:` in route groups.
+- `SecurityHeaders` sets CSP/frame/nosniff/HSTS. CSP still allows `unsafe-inline` and
+  `unsafe-eval` (Alpine + inline page scripts). Backlog: per-request nonces + Alpine CSP build.
+- The test suite takes ~3.5 minutes, mostly pure-PHP Bitcoin key derivation.
+
+## Current state (all tests green: 195 tests, 1675 assertions)
 
 | Area | State |
 |---|---|
@@ -29,10 +53,16 @@ only behind tests that pin the existing behaviour.
 | Reputation: reviews (completed-order buyers only, one per product), vendor reply, helpful votes, follow, cached rating aggregates | done, 11 tests |
 | Messaging: order/general conversations, encrypted bodies, read receipts, blocks, notifications, Order-event listeners | done, 10 tests |
 | Developer Platform: hashed API keys (`dm_live_...`), per-day usage metering, HMAC-signed webhooks with retry | done, 15 tests |
-| Payments (BTC/XMR), Escrow release/payout, Wallet, Disputes, Fees | **not started** |
-| Community (forum), Content/SEO/i18n, Admin | **not started** (empty module folders) |
-| Web UI: buyer / vendor / admin dashboards | **not started** |
+| Payments: `PaymentGateway` contract, Bitcoin (xpub derivation, BlockCypher), Monero (wallet-rpc), `payments:poll` scheduler, only caller of `markPaid` | done, tested with faked HTTP only |
+| Wallet (append-only ledger, commission), payout requests + admin approve/reject/paid | done, 28 tests with Escrow |
+| Escrow: disputes (open/message/admin resolve -> refund or release), vendor fees + tiers | done |
+| Admin API: `admin:create`, users, catalog moderation, categories, orders, settings, stats, audit log | done, 23 tests |
+| Web UI: storefront, buyer area, seller area, admin panel (Blade + Alpine + Tailwind 4, calls `/api/v1` only) | done, QA'd in a browser at 360px/1280px, light/dark, LTR/RTL |
+| i18n: 12 languages (en nl de fr es it pt ru zh-hans ja ko ar) for common/buyer/seller/admin; RTL for Arabic | done, parity test enforces keys + placeholders |
+| Role-aware scope middleware, security headers | done |
+| Community (forum), public content/SEO pages (about, FAQ, terms), sitemap/robots | **not started** |
 | Import of legacy users/orders into the new schema | **not started** |
+| Password reset, email verification, 2FA (TOTP) | **not started** |
 
 ## Architecture rules
 
@@ -87,27 +117,30 @@ pending -> held -> released | refunded; `shipment_status` pending -> shipped -> 
 
 ## Backlog, in order
 
-1. **Payments + Escrow port** (highest risk). Write characterization tests first,
-   `PaymentGateway` / `AddressDeriver` interfaces for BTC and XMR, a scheduler job
-   replacing `cron/monero_payment_cron.php`, and a listener that calls
-   `OrderLifecycle::markPaid` on confirmed payment. Release/refund funds on
-   `OrderCompleted` / `OrderRefunded`. Keep amounts as integers; log every money event.
-2. **Wallet, vendor fees, payouts, disputes** (admin resolves -> `OrderLifecycle::refund`
-   or release).
-3. **Developer Platform follow-ups:** rate plans per key, sandbox/test mode, webhook
-   retry via a real queue worker (currently `QUEUE_CONNECTION`), usage dashboard.
-4. **Community** (forum), **Content/SEO/i18n** (port 12 language files unchanged into
-   Laravel `lang/`). Also: review edit/delete, a dedicated `messages:*` OAuth scope.
-5. **Admin module + API:** users (suspend/verify vendor), catalog moderation, orders,
-   disputes, settings, audit log.
-6. **UI:** buyer dashboard, vendor dashboard, admin panel, storefront. Use the API only.
-   Design system first: one token set (colors, spacing, type) with a distinct brand
-   identity; no clashing colors, no generic template look; verify light/dark contrast.
-   Check every API route has a screen and every screen has working routes (no dead links).
-7. **Legacy import:** artisan command mapping legacy `users`, `products`, `product_orders`
-   into the new schema (idempotent, dry-run flag).
-8. **Hardening:** MySQL CI, secrets only in `.env`, tighten CORS (`config/cors.php`
-   currently allows all origins), audit log, 2FA (TOTP), password reset, e-mail verify.
+1. **Go-live gates (must pass before real money):** run the suite on MySQL (CI service
+   container); Bitcoin testnet + Monero stagenet end-to-end (order -> pay -> detect ->
+   escrow -> ship -> confirm -> vendor credit -> payout); independent security review;
+   configure real xpub / wallet-rpc via `.env` (never commit); queue worker + scheduler
+   (`php artisan schedule:work`) running; HTTPS.
+2. **Account safety:** password reset, email verification, TOTP 2FA (admins first),
+   login throttling by account, session hardening.
+3. **Hardening:** CSP nonces + Alpine CSP build (drop `unsafe-inline/eval`), tighten
+   CORS (`config/cors.php` currently allows all origins for `api/*`), backups, log
+   shipping, rate limits per API key plan.
+4. **Community** (forum) and public content pages (about, FAQ, terms, privacy,
+   how-it-works), sitemap/robots, SEO meta per page, all in the 12 languages.
+5. **Developer Platform follow-ups:** rate plans per key, sandbox/test mode, usage
+   dashboard UI, API docs landing page with an OAuth quickstart.
+6. **Legacy import:** artisan command mapping legacy `users`, `products`, `product_orders`
+   into the new schema (idempotent, dry-run flag) - only if the owner wants history.
+7. **Known UI/API gaps from QA:** dispute list shows `Order #id` (add `order_number` to
+   `DisputeResource`); payout currency should be a select; seller wallet makes 8 API
+   calls (add one summary endpoint); sales-30d card sums first 100 ledger rows (add a
+   server aggregate); review edit/delete; dedicated `messages:*` scope; product form
+   category select. `buyer.order.pay_unavailable` English text changed - other locales
+   still carry the old wording (re-translate).
+8. **CI:** GitHub Actions running `composer install`, `npm run build`, `php artisan test`
+   on PHP 8.3 + MySQL.
 
 ## Decisions already made
 
@@ -125,3 +158,8 @@ php artisan route:list --path=api/v1
 php artisan scramble:export --path=docs/openapi.json
 php artisan migrate:fresh                          # dev only
 ```
+
+## Monero gateway (done)
+- `MoneroGateway` (wallet-rpc `create_address`, piconero math, `get_transfers`), config `config/monero.php`, `Gateways/Monero/{MoneroRpc,MoneroRate,MoneroHealth}`. Registered in PaymentsServiceProvider. 12 tests in `tests/Feature/Payments/MoneroGatewayTest.php`.
+- Legacy view-only derivation (`MoneroHelper`) and the daemon mempool scanner used keccak stubs, not ed25519; they were NOT ported. Wallet RPC is the only source.
+- Deviations: confirmations = least-confirmed tx (legacy: max); pool txs counted as detected; no `/api/v1/health/monero` route yet (no admin scope exists; use `MoneroHealth::check()`).

@@ -30,7 +30,7 @@ class OrderController extends Controller
         $user = $request->user();
         $column = $request->query('role') === 'vendor' ? 'vendor_id' : 'buyer_id';
 
-        $orders = Order::with('items')->where($column, $user->id)
+        $orders = Order::with(['items', 'vendor:id,handle,shop_name'])->where($column, $user->id)
             ->when($request->query('status'), fn ($q, $s) => $q->where('status', $s))
             ->latest('id')->paginate(min($request->integer('per_page', 20), 100));
 
@@ -42,7 +42,7 @@ class OrderController extends Controller
     {
         $this->authorize('view', $order);
 
-        return new OrderResource($order->load('items'));
+        return new OrderResource($order->load(['items', 'vendor:id,handle,shop_name']));
     }
 
     /**

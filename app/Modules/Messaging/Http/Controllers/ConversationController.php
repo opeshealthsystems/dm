@@ -31,7 +31,7 @@ class ConversationController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
-        $conversations = Conversation::with('participants')
+        $conversations = Conversation::with(['participants.user:id,name,handle,shop_name', 'order:id,number'])
             ->whereHas('participants', fn ($q) => $q->where('user_id', $user->id))
             ->orderByDesc('last_message_at')->orderByDesc('id')
             ->paginate(min($request->integer('per_page', 20), 100));
@@ -80,7 +80,7 @@ class ConversationController extends Controller
         $message = $this->messaging->send($conversation, $user, $request->validated('body'));
 
         return response()->json([
-            'data' => (new ConversationResource($conversation->load('participants')))->resolve($request),
+            'data' => (new ConversationResource($conversation->load(['participants.user:id,name,handle,shop_name', 'order:id,number'])))->resolve($request),
             'message' => (new MessageResource($message))->resolve($request),
         ], 201);
     }
@@ -120,6 +120,6 @@ class ConversationController extends Controller
         $this->authorize('view', $conversation);
         $this->messaging->markRead($conversation, $request->user());
 
-        return new ConversationResource($conversation->load('participants'));
+        return new ConversationResource($conversation->load(['participants.user:id,name,handle,shop_name', 'order:id,number']));
     }
 }

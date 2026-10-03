@@ -185,9 +185,9 @@ class DeveloperPlatformTest extends TestCase
 
     public function test_signature_is_correct_and_payload_posted_on_order_event(): void
     {
-        Http::fake(['*' => Http::response('ok', 200)]);
         $vendor = $this->vendor();
         $order = $this->orderFor($vendor);
+        Http::fake(['*' => Http::response('ok', 200)]);
         $this->actAs($vendor);
         $secret = $this->postJson('/api/v1/developer/webhooks', ['url' => 'https://example.test/h', 'events' => ['order.paid']])->json('secret');
 
@@ -213,10 +213,10 @@ class DeveloperPlatformTest extends TestCase
 
     public function test_events_only_go_to_the_orders_vendor_and_subscribed_events(): void
     {
-        Http::fake(['*' => Http::response('ok', 200)]);
         $v1 = $this->vendor();
         $v2 = $this->vendor();
         $order = $this->orderFor($v1);
+        Http::fake(['*' => Http::response('ok', 200)]);
         $this->actAs($v2);
         $this->postJson('/api/v1/developer/webhooks', ['url' => 'https://example.test/other', 'events' => ['order.paid']])->assertCreated();
         $this->actAs($v1);

@@ -29,6 +29,30 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
+    /**
+     * List your own products in every status (draft, active, archived). Requires `catalog:write`.
+     *
+     * Filter with `status` and `q` (title search). Paginated, newest first.
+     */
+    public function mine(Request $request): AnonymousResourceCollection
+    {
+        $products = Product::query()->where('vendor_id', $request->user()->id)
+            ->when($request->query('status'), fn ($q, $v) => $q->where('status', $v))
+            ->when($request->string('q')->trim()->value(), fn ($q, $v) => $q->where('title', 'like', '%' . addcslashes($v, '%_\\') . '%'))
+            ->latest('id')
+            ->paginate(min($request->integer('per_page', 20), 100));
+
+        return ProductResource::collection($products);
+    }
+
+    /** Show one of your own products in any status. Requires `catalog:write`. */
+    public function mineShow(Product $product): ProductResource
+    {
+        $this->authorize('update', $product);
+
+        return new ProductResource($product);
+    }
+
     /** Show one active product (public). */
     public function show(string $slug): ProductResource
     {
@@ -42,7 +66,7 @@ class ProductController extends Controller
     {
         $this->authorize('create', Product::class);
 
-        $product = $request->user()->products()->create($request->validated());
+        $product = $request->user()->products()->create($request->validated())->refresh(); // load DB defaults (currency, stock, status)
 
         return (new ProductResource($product))->response()->setStatusCode(201);
     }

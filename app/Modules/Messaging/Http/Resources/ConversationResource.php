@@ -15,12 +15,14 @@ class ConversationResource extends JsonResource
         return [
             'id' => $this->id,
             'order_id' => $this->order_id,
+            'order_number' => $this->relationLoaded('order') ? $this->order?->number : null,
             'subject' => $this->subject,
             'last_message_at' => $this->last_message_at,
             'unread_count' => app(MessagingService::class)->unreadCount($request->user(), $this->resource),
             // Read receipts: how far each participant has read.
             'participants' => $this->participants->map(fn ($p) => [
                 'user_id' => $p->user_id,
+                'display_name' => $p->relationLoaded('user') && $p->user ? ($p->user->shop_name ?: ($p->user->handle ?: $p->user->name)) : null,
                 'last_read_message_id' => $p->last_read_message_id,
                 'last_read_at' => $p->last_read_at,
             ])->values(),

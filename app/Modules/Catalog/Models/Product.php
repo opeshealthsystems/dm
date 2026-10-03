@@ -21,7 +21,7 @@ class Product extends Model
 
     protected function casts(): array
     {
-        return ['price_cents' => 'integer', 'stock' => 'integer'];
+        return ['price_cents' => 'integer', 'stock' => 'integer', 'moderated_at' => 'datetime'];
     }
 
     protected static function booted(): void

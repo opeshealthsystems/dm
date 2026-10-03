@@ -1,0 +1,79 @@
+<?php
+
+return [
+    'language' => 'Language',
+    'menu' => 'Menu',
+    'logout' => 'Log out',
+    'my_account' => 'My account',
+    'coming_soon' => 'This page is being built.',
+    'save' => 'Save',
+    'cancel' => 'Cancel',
+    'back' => 'Back',
+    'search' => 'Search',
+    'loading' => 'Loading…',
+    'empty' => 'Nothing here yet.',
+    'error' => 'Something went wrong. Try again.',
+    'confirm' => 'Are you sure?',
+
+    'area' => [
+        'buyer' => 'Buyer account',
+        'seller' => 'Seller account',
+        'admin' => 'Admin',
+    ],
+
+    'nav' => [
+        'orders' => 'Orders',
+        'cart' => 'Cart',
+        'messages' => 'Messages',
+        'following' => 'Following',
+        'profile' => 'Profile',
+        'overview' => 'Overview',
+        'products' => 'Products',
+        'wallet' => 'Wallet',
+        'reviews' => 'Reviews',
+        'developers' => 'Developers',
+        'users' => 'Users',
+        'catalog' => 'Catalog',
+        'disputes' => 'Disputes',
+        'payouts' => 'Payouts',
+        'settings' => 'Settings',
+        'audit' => 'Audit log',
+    ],
+
+    'auth' => [
+        'login' => 'Log in',
+        'register' => 'Create account',
+        'email' => 'Email',
+        'password' => 'Password',
+        'name' => 'Your name',
+        'remember' => 'Keep me logged in',
+        'no_account' => 'New here?',
+        'have_account' => 'Already have an account?',
+        'account_type' => 'I want to',
+        'buyer' => 'Buy',
+        'seller' => 'Sell',
+        'shop_name' => 'Shop name',
+        'password_hint' => 'At least 10 characters, with letters and numbers.',
+        'failed' => 'Those details don\'t match our records.',
+        'suspended' => 'This account is suspended.',
+    ],
+
+    'home' => [
+        'title' => 'Shop from independent sellers',
+        'subtitle' => 'Every order is protected by escrow until you confirm delivery.',
+        'empty' => 'No products yet. Check back soon.',
+    ],
+
+    'confirm_ok' => 'Confirm',
+    'date' => 'Date',
+
+    'status' => [
+        'label' => 'Status',
+        'pending_payment' => 'Awaiting payment',
+        'paid' => 'Paid',
+        'shipped' => 'Shipped',
+        'completed' => 'Completed',
+        'cancelled' => 'Cancelled',
+        'disputed' => 'In dispute',
+    ],
+];

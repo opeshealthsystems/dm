@@ -52,6 +52,9 @@ class OrderLifecycle
     public function ship(Order $order, string $trackingNumber): Order
     {
         [$fresh] = $this->locked($order, function (Order $o) use ($trackingNumber) {
+            if ($o->status === Order::STATUS_DISPUTED) {
+                throw new OrderException('An order under dispute cannot be shipped.');
+            }
             if ($o->escrow_status !== Order::ESCROW_HELD || $o->shipment_status !== Order::SHIPMENT_PENDING) {
                 throw new OrderException('Only a paid order that has not shipped can be shipped.');
             }
@@ -74,12 +77,64 @@ class OrderLifecycle
     public function confirmReceipt(Order $order): Order
     {
         [$fresh] = $this->locked($order, function (Order $o) {
+            if ($o->status === Order::STATUS_DISPUTED) {
+                throw new OrderException('An order under dispute cannot be confirmed; an admin must resolve the dispute.');
+            }
             if ($o->escrow_status !== Order::ESCROW_HELD || $o->shipment_status !== Order::SHIPMENT_SHIPPED) {
                 throw new OrderException('Receipt can only be confirmed for a shipped order whose funds are held.');
             }
             $o->forceFill([
                 'escrow_status' => Order::ESCROW_RELEASED,
                 'shipment_status' => Order::SHIPMENT_DELIVERED,
+                'status' => Order::STATUS_COMPLETED,
+                'confirmed_at' => now(),
+            ])->save();
+
+            return [$o, true];
+        });
+
+        event(new OrderCompleted($fresh));
+
+        return $fresh;
+    }
+
+    /**
+     * Freeze a paid order because a dispute was opened (legacy: status -> 'disputed').
+     * Only an order whose funds are held and that is paid or shipped can be frozen.
+     */
+    public function markDisputed(Order $order): Order
+    {
+        [$fresh] = $this->locked($order, function (Order $o) {
+            if ($o->escrow_status !== Order::ESCROW_HELD
+                || ! in_array($o->status, [Order::STATUS_PAID, Order::STATUS_SHIPPED], true)) {
+                throw new OrderException('A dispute can only be opened on an order whose funds are held.');
+            }
+            $o->forceFill(['status' => Order::STATUS_DISPUTED])->save();
+
+            return [$o, true];
+        });
+
+        return $fresh;
+    }
+
+    /**
+     * Admin/dispute outcome in the vendor's favour: release held funds to the vendor.
+     *
+     * Same end state and event as confirmReceipt (escrow released, status completed,
+     * OrderCompleted dispatched, which credits the vendor wallet), but it does not require the
+     * buyer's confirmation and also works on a disputed order. Locked and state-checked, so a
+     * second call (or a call after a refund) throws and nothing moves twice.
+     */
+    public function releaseToVendor(Order $order): Order
+    {
+        [$fresh] = $this->locked($order, function (Order $o) {
+            if ($o->escrow_status !== Order::ESCROW_HELD
+                || ! in_array($o->status, [Order::STATUS_PAID, Order::STATUS_SHIPPED, Order::STATUS_DISPUTED], true)) {
+                throw new OrderException('Only an order whose funds are held can be released to the vendor.');
+            }
+            $o->forceFill([
+                'escrow_status' => Order::ESCROW_RELEASED,
+                'shipment_status' => $o->shipment_status === Order::SHIPMENT_SHIPPED ? Order::SHIPMENT_DELIVERED : $o->shipment_status,
                 'status' => Order::STATUS_COMPLETED,
                 'confirmed_at' => now(),
             ])->save();

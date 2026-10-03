@@ -2,8 +2,158 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views';
+
+/*
+ * Design tokens. One accent (indigo) for brand and interaction; green, amber and red mean
+ * status only. Indigo is far from all three, so no two colours can be confused.
+ * Dark mode swaps the values, never the names.
+ */
+:root {
+    --c-bg: #f6f6f9;
+    --c-surface: #ffffff;
+    --c-surface-2: #f0f0f5;
+    --c-border: #e2e2ea;
+    --c-text: #17172b;
+    --c-text-2: #55556b;
+    --c-text-3: #80809a;
+    --c-accent: #4338ca;
+    --c-accent-hover: #3730a3;
+    --c-accent-soft: #e8e7fb;
+    --c-on-accent: #ffffff;
+    --c-ok: #166534;       --c-ok-soft: #dcf3e3;
+    --c-warn: #8a4b08;     --c-warn-soft: #fdf0d2;
+    --c-bad: #a31d1d;      --c-bad-soft: #fde6e6;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --c-bg: #101019;
+        --c-surface: #181824;
+        --c-surface-2: #212130;
+        --c-border: #2e2e42;
+        --c-text: #ececf6;
+        --c-text-2: #a9a9c0;
+        --c-text-3: #7d7d96;
+        --c-accent: #8b86f5;
+        --c-accent-hover: #a29ef8;
+        --c-accent-soft: #29274f;
+        --c-on-accent: #101019;
+        --c-ok: #7fd49a;   --c-ok-soft: #12301f;
+        --c-warn: #f0bd6a; --c-warn-soft: #3a2a0c;
+        --c-bad: #f19a9a;  --c-bad-soft: #3b1515;
+    }
+}
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans JP',
+        'Noto Sans KR', 'Noto Sans SC', sans-serif;
+    --color-bg: var(--c-bg);
+    --color-surface: var(--c-surface);
+    --color-surface-2: var(--c-surface-2);
+    --color-line: var(--c-border);
+    --color-ink: var(--c-text);
+    --color-ink-2: var(--c-text-2);
+    --color-ink-3: var(--c-text-3);
+    --color-accent: var(--c-accent);
+    --color-accent-hover: var(--c-accent-hover);
+    --color-accent-soft: var(--c-accent-soft);
+    --color-on-accent: var(--c-on-accent);
+    --color-ok: var(--c-ok);
+    --color-ok-soft: var(--c-ok-soft);
+    --color-warn: var(--c-warn);
+    --color-warn-soft: var(--c-warn-soft);
+    --color-bad: var(--c-bad);
+    --color-bad-soft: var(--c-bad-soft);
 }
+
+@layer base {
+    html { background: var(--c-bg); color: var(--c-text); }
+    body { font-family: var(--font-sans); font-size: 15px; line-height: 1.55; min-height: 100vh; }
+    a { color: var(--c-accent); }
+    :focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+    input, select, textarea {
+        width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--c-border); border-radius: 8px;
+        background: var(--c-surface); color: var(--c-text);
+    }
+    textarea { padding: 10px 12px; min-height: 96px; }
+    label { display: block; font-size: 13px; color: var(--c-text-2); margin-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: start; font-weight: 500; font-size: 12px; color: var(--c-text-3); padding: 8px; border-bottom: 1px solid var(--c-border); }
+    td { padding: 10px 8px; border-bottom: 1px solid var(--c-border); }
+}
+
+@layer components {
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px;
+        border-radius: 8px; border: 1px solid var(--c-border); background: var(--c-surface); color: var(--c-text);
+        font-weight: 500; cursor: pointer; text-decoration: none; }
+    .btn:hover { background: var(--c-surface-2); }
+    .btn-primary { background: var(--c-accent); color: var(--c-on-accent); border-color: var(--c-accent); }
+    .btn-primary:hover { background: var(--c-accent-hover); }
+    .btn-sm { min-height: 36px; padding: 0 12px; font-size: 13px; }
+    .btn-danger { color: var(--c-bad); }
+    .card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 12px; padding: 16px; }
+    .stat { background: var(--c-surface-2); border-radius: 10px; padding: 12px 14px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500;
+        background: var(--c-surface-2); color: var(--c-text-2); }
+    .badge-ok { background: var(--c-ok-soft); color: var(--c-ok); }
+    .badge-warn { background: var(--c-warn-soft); color: var(--c-warn); }
+    .badge-bad { background: var(--c-bad-soft); color: var(--c-bad); }
+    .badge-accent { background: var(--c-accent-soft); color: var(--c-accent); }
+    .nav-link { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 8px;
+        color: var(--c-text-2); text-decoration: none; }
+    .nav-link:hover { background: var(--c-surface-2); }
+    .nav-link[aria-current='page'] { background: var(--c-accent-soft); color: var(--c-accent); font-weight: 500; }
+    .table-wrap { overflow-x: auto; }
+}
+
+/*
+ * Polish layer. Unlayered on purpose: it must win over utility classes in the few places
+ * where a component rule needs to be stricter (touch targets, stacked tables).
+ */
+h1 { font-size: 1.5rem; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+h2 { font-weight: 600; letter-spacing: -0.005em; }
+@media (min-width: 640px) { h1 { font-size: 1.75rem; } }
+.btn:active { transform: translateY(1px); }
+.btn:disabled, .btn[disabled] { opacity: .55; cursor: not-allowed; }
+.btn-primary:disabled { background: var(--c-accent); }
+.card { overflow-wrap: anywhere; }
+a.card-link { display: block; text-decoration: none; color: inherit; }
+.card-hover { transition: border-color .15s, box-shadow .15s; }
+.card-hover:hover, .card-hover:focus-within { border-color: var(--c-accent); }
+
+/* Back link: arrow is drawn in CSS so it mirrors in RTL. */
+.back-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-bottom: 4px; font-size: 14px; text-decoration: none; }
+.back-link::before { content: '\2190'; }
+[dir='rtl'] .back-link::before { content: '\2192'; }
+.back-link:hover { text-decoration: underline; }
+
+/* Empty state: a clear message plus one next action. */
+.empty { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 32px 16px;
+    border: 1px dashed var(--c-border); border-radius: 12px; background: var(--c-surface); color: var(--c-text-2); }
+.empty .btn { margin-top: 4px; }
+
+.lang-select { min-height: 36px; }
+/* Touch targets: 44px on phones/tablets and any coarse pointer. */
+@media (max-width: 1023px), (pointer: coarse) {
+    .btn-sm, .lang-select { min-height: 44px; }
+    .link-tap { display: inline-flex; align-items: center; min-height: 44px; }
+}
+.dash-top .btn-sm { min-height: 44px; }
+
+/* Wide tables become stacked cards on phones (labels come from the header cells, see app.js). */
+@media (max-width: 639px) {
+    .table-wrap { overflow-x: visible; padding: 4px 12px; }
+    .table-wrap table { min-width: 0 !important; display: block; }
+    .table-wrap thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .table-wrap tbody { display: block; }
+    .table-wrap tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--c-border); }
+    .table-wrap tbody tr:last-child { border-bottom: 0; }
+    .table-wrap td { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 4px 0;
+        border: 0; max-width: none !important; white-space: normal !important; text-align: end; overflow-wrap: anywhere; }
+    .table-wrap td[data-label]:not([data-label=''])::before { content: attr(data-label); flex: none; font-size: 12px;
+        color: var(--c-text-3); text-align: start; }
+    .table-wrap td:not([data-label]), .table-wrap td[data-label=''] { display: block; padding-top: 8px; text-align: start; }
+    .table-wrap td > .flex { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0s !important; animation-duration: 0s !important; scroll-behavior: auto !important; } }

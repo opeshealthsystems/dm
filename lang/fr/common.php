@@ -1,0 +1,79 @@
+<?php
+
+return [
+    'language' => 'Langue',
+    'menu' => 'Menu',
+    'logout' => 'Se déconnecter',
+    'my_account' => 'Mon compte',
+    'coming_soon' => 'Cette page est en cours de création.',
+    'save' => 'Enregistrer',
+    'cancel' => 'Annuler',
+    'back' => 'Retour',
+    'search' => 'Rechercher',
+    'loading' => 'Chargement…',
+    'empty' => 'Rien ici pour le moment.',
+    'error' => 'Une erreur s\'est produite. Veuillez réessayer.',
+    'confirm' => 'Êtes-vous sûr ?',
+
+    'area' => [
+        'buyer' => 'Compte acheteur',
+        'seller' => 'Compte vendeur',
+        'admin' => 'Administration',
+    ],
+
+    'nav' => [
+        'orders' => 'Commandes',
+        'cart' => 'Panier',
+        'messages' => 'Messages',
+        'following' => 'Abonnements',
+        'profile' => 'Profil',
+        'overview' => 'Vue d\'ensemble',
+        'products' => 'Produits',
+        'wallet' => 'Portefeuille',
+        'reviews' => 'Avis',
+        'developers' => 'Développeurs',
+        'users' => 'Utilisateurs',
+        'catalog' => 'Catalogue',
+        'disputes' => 'Litiges',
+        'payouts' => 'Paiements sortants',
+        'settings' => 'Paramètres',
+        'audit' => 'Journal d\'audit',
+    ],
+
+    'auth' => [
+        'login' => 'Se connecter',
+        'register' => 'Créer un compte',
+        'email' => 'E-mail',
+        'password' => 'Mot de passe',
+        'name' => 'Votre nom',
+        'remember' => 'Rester connecté',
+        'no_account' => 'Nouveau ici ?',
+        'have_account' => 'Vous avez déjà un compte ?',
+        'account_type' => 'Je souhaite',
+        'buyer' => 'Acheter',
+        'seller' => 'Vendre',
+        'shop_name' => 'Nom de la boutique',
+        'password_hint' => 'Au moins 10 caractères, avec des lettres et des chiffres.',
+        'failed' => 'Ces informations ne correspondent pas à nos enregistrements.',
+        'suspended' => 'Ce compte est suspendu.',
+    ],
+
+    'home' => [
+        'title' => 'Achetez auprès de vendeurs indépendants',
+        'subtitle' => 'Chaque commande est protégée par un séquestre (escrow) jusqu\'à ce que vous confirmiez la livraison.',
+        'empty' => 'Aucun produit pour le moment. Revenez bientôt.',
+    ],
+
+    'confirm_ok' => 'Confirmer',
+    'date' => 'Date',
+
+    'status' => [
+        'label' => 'Statut',
+        'pending_payment' => 'En attente de paiement',
+        'paid' => 'Payée',
+        'shipped' => 'Expédiée',
+        'completed' => 'Terminée',
+        'cancelled' => 'Annulée',
+        'disputed' => 'En litige',
+    ],
+];

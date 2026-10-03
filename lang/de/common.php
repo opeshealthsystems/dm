@@ -1,0 +1,79 @@
+<?php
+
+return [
+    'language' => 'Sprache',
+    'menu' => 'Menü',
+    'logout' => 'Abmelden',
+    'my_account' => 'Mein Konto',
+    'coming_soon' => 'Diese Seite ist noch in Arbeit.',
+    'save' => 'Speichern',
+    'cancel' => 'Abbrechen',
+    'back' => 'Zurück',
+    'search' => 'Suchen',
+    'loading' => 'Wird geladen…',
+    'empty' => 'Hier gibt es noch nichts.',
+    'error' => 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.',
+    'confirm' => 'Sind Sie sicher?',
+
+    'area' => [
+        'buyer' => 'Käuferkonto',
+        'seller' => 'Verkäuferkonto',
+        'admin' => 'Administration',
+    ],
+
+    'nav' => [
+        'orders' => 'Bestellungen',
+        'cart' => 'Warenkorb',
+        'messages' => 'Nachrichten',
+        'following' => 'Gefolgt',
+        'profile' => 'Profil',
+        'overview' => 'Übersicht',
+        'products' => 'Produkte',
+        'wallet' => 'Wallet',
+        'reviews' => 'Bewertungen',
+        'developers' => 'Entwickler',
+        'users' => 'Benutzer',
+        'catalog' => 'Katalog',
+        'disputes' => 'Streitfälle',
+        'payouts' => 'Auszahlungen',
+        'settings' => 'Einstellungen',
+        'audit' => 'Prüfprotokoll',
+    ],
+
+    'auth' => [
+        'login' => 'Anmelden',
+        'register' => 'Konto erstellen',
+        'email' => 'E-Mail-Adresse',
+        'password' => 'Passwort',
+        'name' => 'Ihr Name',
+        'remember' => 'Angemeldet bleiben',
+        'no_account' => 'Neu hier?',
+        'have_account' => 'Sie haben bereits ein Konto?',
+        'account_type' => 'Ich möchte',
+        'buyer' => 'Kaufen',
+        'seller' => 'Verkaufen',
+        'shop_name' => 'Shop-Name',
+        'password_hint' => 'Mindestens 10 Zeichen, mit Buchstaben und Zahlen.',
+        'failed' => 'Diese Angaben stimmen nicht mit unseren Aufzeichnungen überein.',
+        'suspended' => 'Dieses Konto ist gesperrt.',
+    ],
+
+    'home' => [
+        'title' => 'Einkaufen bei unabhängigen Verkäufern',
+        'subtitle' => 'Jede Bestellung ist durch Escrow geschützt, bis Sie die Lieferung bestätigen.',
+        'empty' => 'Noch keine Produkte. Schauen Sie bald wieder vorbei.',
+    ],
+
+    'confirm_ok' => 'Bestätigen',
+    'date' => 'Datum',
+
+    'status' => [
+        'label' => 'Status',
+        'pending_payment' => 'Zahlung ausstehend',
+        'paid' => 'Bezahlt',
+        'shipped' => 'Versendet',
+        'completed' => 'Abgeschlossen',
+        'cancelled' => 'Storniert',
+        'disputed' => 'Im Streitfall',
+    ],
+];
